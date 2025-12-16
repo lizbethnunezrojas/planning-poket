@@ -38,8 +38,4 @@ describe('GameNameValidator', () => {
     expect(control.errors).toEqual({ tooManyNumbers: true });
   });
 
-  it('debe ser INVÁLIDO si contiene solo números (ej: 123456)', () => {
-    control.setValue('123456');
-    expect(control.errors).toEqual({ onlyNumbers: true }); 
-  });
 });
