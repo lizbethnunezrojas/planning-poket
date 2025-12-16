@@ -1,0 +1,20 @@
+.form-field-container {
+  margin-bottom: 20px;
+
+  .field-label {
+    display: block;
+    font-size: 14px;
+    font-weight: 700;
+    margin-bottom: 5px;
+  }
+
+  .error-message {
+    color: #dc3545; 
+    margin-top: 5px;
+    font-size: 13px;
+    font-weight: 300;
+
+
+  }
+  
+}

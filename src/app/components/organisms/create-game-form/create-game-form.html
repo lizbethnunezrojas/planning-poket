@@ -1,0 +1,15 @@
+<form [formGroup]="createGameForm" (ngSubmit)="onSubmit()" class="create-game-container">
+  
+  <app-form-field
+    label="Nombra la Partida"
+    [control]="nameControl" 
+  ></app-form-field>
+  
+  <app-button
+    text="Crear partida"
+    type="submit"
+    [disabled]="createGameForm.invalid" 
+    (buttonClick)="onSubmit()"          
+  ></app-button>
+
+</form>

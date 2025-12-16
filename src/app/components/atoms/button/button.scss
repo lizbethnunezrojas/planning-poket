@@ -1,0 +1,25 @@
+.app-button {
+  padding: 10px;
+  font-size: 1rem;
+  font-weight: 600;
+  text-align: center;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  border-radius: 50px;
+  width: 159px;
+  height: 40px;
+  color: #330072;
+  background-color: #ffffff;
+
+  &:active:not([disabled]) {
+    background-color: #d5b9f0;
+  }
+
+  &[disabled] {
+    color: #9d9da199;
+    background-color: #9d9da14d;
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
+}
