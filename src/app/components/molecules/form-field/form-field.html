@@ -1,19 +1,17 @@
 <div class="form-field-container">
   
-  @if (label) {
+    @if (label) {
     <label [for]="control ? control.value : 'default-id'" class="field-label">
       {{ label }}
     </label>
-  }
+    }
+
+    <app-input-text [control]="control" [placeholder]="placeholder"></app-input-text>
   
-  <app-input-text
-    [control]="control"
-    [placeholder]="placeholder"
-  ></app-input-text>
 
   @if (errorMessage) {
-    <div class="error-message">
-      {{ errorMessage }}
-    </div>
+  <div class="error-message">
+    {{ errorMessage }}
+  </div>
   }
 </div>
