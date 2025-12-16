@@ -5,8 +5,8 @@ import { FormControl, ReactiveFormsModule } from '@angular/forms';
   selector: 'app-input-text',
   standalone: true,
   imports: [ReactiveFormsModule], 
-  templateUrl: './input-text.html',
-  styleUrls: ['./input-text.scss'],
+  templateUrl: './input-text.component.html',
+  styleUrls: ['./input-text.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class InputTextComponent {

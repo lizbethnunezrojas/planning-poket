@@ -1,13 +1,13 @@
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
-import { InputTextComponent } from '../../atoms/input-text/input-text';
+import { InputTextComponent } from '../../atoms/input-text/input-text.component';
 
 @Component({
   selector: 'app-form-field',
   standalone: true,
   imports: [ReactiveFormsModule, InputTextComponent],
-  templateUrl: './form-field.html',
-  styleUrls: ['./form-field.scss'],
+  templateUrl: './form-field.component.html',
+  styleUrls: ['./form-field.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class FormField {

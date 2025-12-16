@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
-import { CreateGameForm } from '../../../components/organisms/create-game-form/create-game-form';
+import { CreateGameForm } from '../../../components/organisms/create-game-form/create-game-form.component';
 import { GameService } from '../../../core/services/game';
 
 @Component({

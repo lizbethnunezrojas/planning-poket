@@ -14,8 +14,8 @@ import {
   FormControl,
 } from '@angular/forms';
 
-import { FormField } from '../../molecules/form-field/form-field';
-import { ButtonComponent } from '../../atoms/buttonComponent/button';
+import { FormField } from '../../molecules/form-field/form-field.component';
+import { ButtonComponent } from '../../atoms/buttonComponent/button.component';
 
 import {
   NameValidator,
@@ -30,8 +30,8 @@ interface CreateGameFormValues {
   selector: 'app-create-game-form',
   standalone: true,
   imports: [ReactiveFormsModule, FormField, ButtonComponent],
-  templateUrl: './create-game-form.html',
-  styleUrls: ['./create-game-form.scss'],
+  templateUrl: './create-game-form.component.html',
+  styleUrls: ['./create-game-form.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CreateGameForm {
