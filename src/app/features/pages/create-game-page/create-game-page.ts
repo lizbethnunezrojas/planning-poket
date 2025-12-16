@@ -1,5 +1,6 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { CreateGameForm } from '../../../components/organisms/create-game-form/create-game-form';
+import { GameService } from '../../../core/services/game';
 
 @Component({
   selector: 'app-create-game-page',
@@ -11,7 +12,13 @@ import { CreateGameForm } from '../../../components/organisms/create-game-form/c
 })
 export class CreateGamePage {
 
+  private readonly gameService = inject(GameService);
+  // private readonly router = inject(Router); // Para la navegación futura
+
   public handleGameCreation(gameName: string): void {
-    console.log(`Página: Creando partida con nombre: ${gameName}`);
-  }
-}
+    
+    // 1. Lógica de Negocio: Llama al servicio para guardar los datos
+    const gameId = this.gameService.createGame(gameName);
+    
+    console.log(`[LÓGICA COMPLETADA] Partida creada y guardada. ID: ${gameId}`);
+}}

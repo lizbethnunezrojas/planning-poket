@@ -11,12 +11,4 @@ export class Button {
   @Input({ required: true }) text!: string; 
   
   @Input() disabled: boolean = false;
-
-  @Output() buttonClick = new EventEmitter<void>();
-
-  onClick(): void {
-    if (!this.disabled) {
-      this.buttonClick.emit();
-    }
-  }
 }
