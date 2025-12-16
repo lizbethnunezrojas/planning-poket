@@ -4,7 +4,7 @@ import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormControl } 
 
 import { FormField } from '../../molecules/form-field/form-field';
 import { NameValidator } from '../../../core/validators/name';
-import { Button } from '../../atoms/button/button';
+import { ButtonComponent } from '../../atoms/buttonComponent/button';
 
 interface CreateGameFormValues {
   name: string;
@@ -13,7 +13,7 @@ interface CreateGameFormValues {
 @Component({
   selector: 'app-create-game-form',
   standalone: true,
-  imports: [ReactiveFormsModule, FormField, Button], 
+  imports: [ReactiveFormsModule, FormField, ButtonComponent], 
   templateUrl: './create-game-form.html',
   styleUrls: ['./create-game-form.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,

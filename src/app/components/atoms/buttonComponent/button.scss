@@ -6,9 +6,8 @@
   border: none;
   cursor: pointer;
   transition: all 0.2s ease-in-out;
-  border-radius: 50px;
-  width: 159px;
-  height: 40px;
+  border-radius: 50px; 
+  min-height: 40px;
   color: #330072;
   background-color: #ffffff;
 
@@ -17,8 +16,6 @@
   }
 
   &[disabled] {
-    color: #9d9da199;
-    background-color: #9d9da14d;
     cursor: not-allowed;
     opacity: 0.6;
   }

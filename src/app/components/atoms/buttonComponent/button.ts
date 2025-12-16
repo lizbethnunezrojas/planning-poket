@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, Input, Output, EventEmitter } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input} from '@angular/core';
 
 @Component({
   selector: 'app-button',
@@ -7,8 +7,10 @@ import { ChangeDetectionStrategy, Component, Input, Output, EventEmitter } from 
   styleUrls: ['./button.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class Button {
+export class ButtonComponent {
   @Input({ required: true }) text!: string; 
   
   @Input() disabled: boolean = false;
+
+  @Input() type: 'button' | 'submit' = 'button';
 }
