@@ -9,8 +9,8 @@ import { FormControl, ReactiveFormsModule } from '@angular/forms';
   styleUrls: ['./input-text.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class InputText { 
-  @Input({ required: true }) control!: FormControl; 
-  @Input() label: string = '';
-  @Input() placeholder: string = '';
+export class InputTextComponent {
+  @Input({ required: true }) control!: FormControl;
+  @Input() placeholder = '';
+  @Input({ required: true }) id!: string;
 }
