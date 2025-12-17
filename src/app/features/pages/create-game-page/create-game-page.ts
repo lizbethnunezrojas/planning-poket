@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { CreateGameForm } from '../../../components/organisms/create-game-form/create-game-form.component';
-import { GameService } from '../../../core/services/game';
+import { GameService } from '../../../core/services/game.service';
 
 @Component({
   selector: 'app-create-game-page',

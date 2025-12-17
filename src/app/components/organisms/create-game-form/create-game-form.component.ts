@@ -15,12 +15,12 @@ import {
 } from '@angular/forms';
 
 import { FormField } from '../../molecules/form-field/form-field.component';
-import { ButtonComponent } from '../../atoms/buttonComponent/button.component';
+import { ButtonComponent } from '../../atoms/button/button.component';
 
 import {
   NameValidator,
   getNameErrorMessage,
-} from '../../../core/validators/name';
+} from '../../../core/validators/name.validator';
 
 interface CreateGameFormValues {
   name: string;

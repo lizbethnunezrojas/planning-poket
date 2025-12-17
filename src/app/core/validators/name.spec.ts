@@ -1,5 +1,5 @@
 import { FormControl } from '@angular/forms';
-import { NameValidator } from './name';
+import { NameValidator } from './name.validator';
 
 describe('GameNameValidator', () => {
   const control = new FormControl('', NameValidator);
