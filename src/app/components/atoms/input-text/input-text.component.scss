@@ -4,18 +4,14 @@
 
   .text-input {
     padding: 0 15px;
-    min-height: 40px;
-    border: 2px #8d14e9 solid;
+    height: 40px;
+    box-sizing: border-box;
+    border: 1px #BB65FF solid;
     color: white;
     border-radius: 100px;
     font-size: 1rem;
     transition: border-color 0.3s ease;
-    background-color: #6429CD14;
-
-    &:focus {
-      border-color: #BB65FF ; 
-      outline: none;
-    }
-
+    background-color: #6429cd14;
+    outline: none;
   }
 }

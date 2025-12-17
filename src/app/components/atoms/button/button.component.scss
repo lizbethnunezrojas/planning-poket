@@ -10,6 +10,7 @@
   min-height: 40px;
   color: #330072;
   background-color: #ffffff;
+  width: 159px; 
 
   &:active:not([disabled]) {
     background-color: #d5b9f0;
@@ -17,6 +18,8 @@
 
   &[disabled] {
     cursor: not-allowed;
-    opacity: 0.6;
+    background-color: rgba(156, 163, 175, 0.3);
+    color: #7E7291;
+    
   }
 }

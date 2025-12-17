@@ -12,4 +12,11 @@ import { FormControl, ReactiveFormsModule } from '@angular/forms';
 export class InputTextComponent {
   @Input({ required: true }) control!: FormControl;
   @Input({ required: true }) id!: string;
+
+  public applyTrim(): void {
+    const value = this.control.value;
+    if (typeof value === 'string') {
+      this.control.setValue(value.trim());
+    }
+  }
 }

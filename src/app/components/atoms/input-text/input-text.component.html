@@ -2,6 +2,7 @@
   <input 
     type="text" 
     [formControl]="control" 
+    (blur)="applyTrim()"
     [id]="id" 
     class="text-input"
     

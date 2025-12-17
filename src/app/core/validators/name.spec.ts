@@ -38,4 +38,14 @@ describe('GameNameValidator', () => {
     expect(control.errors).toEqual({ tooManyNumbers: true });
   });
 
+  it('debe ser INVÁLIDO si contiene espacios al comienzo', () => {
+    control.setValue(' Partida12');
+    expect(control.errors).toEqual({ invalidSpaces: true });
+  });
+
+  it('debe ser INVÁLIDO si contiene solo espacios', () => {
+    control.setValue('      ');
+    expect(control.errors).toEqual({ invalidSpaces: true });
+  });
+
 });

@@ -1,16 +1,14 @@
-import {
-  AbstractControl,
-  ValidationErrors,
-  ValidatorFn,
-} from '@angular/forms';
+import { AbstractControl, ValidationErrors, ValidatorFn } from '@angular/forms';
 
-export const NameValidator: ValidatorFn = (
-  control: AbstractControl
-): ValidationErrors | null => {
+export const NameValidator: ValidatorFn = (control: AbstractControl): ValidationErrors | null => {
   const name = control.value as string;
 
   if (!name) {
     return null;
+  }
+
+  if (name.trim().length !== name.length) {
+    return { invalidSpaces: true };
   }
 
   const specialCharsRegex = /[-_.*#/()%¿?¡!{}=$"°,;|'[\]\\]/;
@@ -26,9 +24,7 @@ export const NameValidator: ValidatorFn = (
   return null;
 };
 
-export function getNameErrorMessage(
-  control: AbstractControl | null
-): string | null {
+export function getNameErrorMessage(control: AbstractControl | null): string | null {
   if (!control || !(control.dirty || control.touched)) {
     return null;
   }
@@ -37,6 +33,10 @@ export function getNameErrorMessage(
     return 'Este campo es obligatorio.';
   }
 
+  if (control.hasError('invalidSpaces')) {
+    return 'El nombre no puede tener espacios al inicio ni al final.';
+  }
+  
   if (control.hasError('minlength')) {
     return `El nombre debe tener al menos ${
       control.getError('minlength')?.requiredLength
