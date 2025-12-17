@@ -13,7 +13,6 @@ import { InputTextComponent } from '../../atoms/input-text/input-text.component'
 export class FormField {
   @Input({ required: true }) control!: FormControl;
   @Input() label = '';
-  @Input() placeholder = '';
   @Input() errorMessage: string | null = null;
 
   readonly inputId = `input-${crypto.randomUUID()}`;
