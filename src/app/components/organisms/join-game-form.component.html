@@ -1,5 +1,5 @@
 <form [formGroup]="joinForm" (ngSubmit)="onSubmit() " class="join-game-container">
-  <app-form-field label="Tu nombre" [control]="userNameControl" [errorMessage]="userNameErrorMessage"></app-form-field>
+  <app-form-field label="Tu nombre" [control]="nameControl" [errorMessage]="nameErrorMessage"></app-form-field>
   
 
   <app-mode-selector-group [control]="viewModeControl"> </app-mode-selector-group>

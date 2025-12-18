@@ -9,8 +9,7 @@ export class GameService {
   private readonly STORAGE_KEY = 'planning_poker_game';
 
   public createGame(gameName: string): string {
-    const newGameId = this.generateUniqueId();
-    
+    const newGameId = this.generateUniqueId();   
     const newGame: Game = {
       id: newGameId,
       name: gameName

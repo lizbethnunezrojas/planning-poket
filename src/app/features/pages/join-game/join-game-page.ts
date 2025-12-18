@@ -1,5 +1,9 @@
-import { Component, ChangeDetectionStrategy } from '@angular/core';
+import { Component, ChangeDetectionStrategy, inject } from '@angular/core';
+import { Router } from '@angular/router';
 import { JoinGameFormComponent } from '../../../components/organisms/join-game-form.component';
+import { UserService } from '../../../core/services/user.service';
+import { ViewMode } from '../../../core/models/user.model';
+
 
 @Component({
   selector: 'app-join-game-page',
@@ -10,8 +14,15 @@ import { JoinGameFormComponent } from '../../../components/organisms/join-game-f
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class JoinGamePage {
+
+  private readonly userService = inject(UserService);
+  private readonly router = inject(Router);
   
-  public handleJoin(formData: any): void {
-    console.log('Formulario recibido en la página:', formData);
+  public handleJoin(userData: { name: string; viewMode: ViewMode }): void {
+    this.userService.saveUser(userData);
+    
+    console.log('[JoinGamePage] Usuario guardado:', this.userService.getCurrentUser());
   }
+
+  
 }
