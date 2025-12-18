@@ -6,6 +6,9 @@ export interface User {
   name: string;      
   role: UserRole;    
   viewMode: ViewMode;
+  selectedCard?: string | null; 
+  hasSelectedCard: boolean;
+  gameId: string;
 }
 
 export type CreateUserPayload = Omit<User, 'id'>;

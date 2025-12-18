@@ -1,25 +1,24 @@
-import { Injectable} from '@angular/core';
-import { Game } from '../models/game.model'; 
+import { Injectable } from '@angular/core';
+import { Game } from '../models/game.model';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class GameService {
-  
   private readonly STORAGE_KEY = 'planning_poker_game';
 
-  public createGame(gameName: string): string {
-    const newGameId = this.generateUniqueId();   
+  public createGame(gameName: string): Game {
+    const newGameId = this.generateUniqueId();
     const newGame: Game = {
       id: newGameId,
-      name: gameName
+      name: gameName,
     };
 
     localStorage.setItem(this.STORAGE_KEY, JSON.stringify(newGame));
-    
+
     console.log(`[GameService] Partida '${gameName}' creada con ID: ${newGameId}`);
-    
-    return newGameId;
+
+    return newGame;
   }
 
   private generateUniqueId(): string {
@@ -28,9 +27,6 @@ export class GameService {
 
   public getCurrentGame(): Game | null {
     const gameJson = localStorage.getItem(this.STORAGE_KEY);
-    if (gameJson) {
-      return JSON.parse(gameJson) as Game;
-    }
-    return null;
+    return gameJson ? (JSON.parse(gameJson) as Game) : null;
   }
 }

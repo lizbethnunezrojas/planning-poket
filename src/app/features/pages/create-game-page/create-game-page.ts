@@ -16,8 +16,8 @@ export class CreateGamePage {
   private readonly gameService = inject(GameService);
 
   public handleGameCreation(gameName: string): void {
-    this.gameService.createGame(gameName);
+    const newGame = this.gameService.createGame(gameName);
 
-    this.router.navigate(['/join']);
+    this.router.navigate(['/join', newGame.id]);
   }
 }

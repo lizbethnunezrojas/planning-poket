@@ -1,0 +1,12 @@
+<div [class]="['card-container', cardClass()]">
+  @if (viewMode() === 'spectator') {
+    <div class="circle-content">
+      {{ initials() }}
+    </div>
+  } @else {
+    <div class="card-content">
+      {{ value() || '' }}
+    </div>
+  }
+</div>
+<span class="player-name">{{ userName() }}</span>

@@ -1,0 +1,65 @@
+// Variables locales para fácil mantenimiento
+$card-width: 100px;
+$card-height: 140px;
+$circle-size: 80px;
+$primary-color: #673ab7; // Cambia según tu paleta de Figma
+$border-color: #ccc;
+$bg-spectator: rgba(103, 58, 183, 0.1);
+
+.card-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  font-family: 'Arial', sans-serif;
+
+  // Estado: Espectador (Círculo)
+  &.card--spectator {
+    .circle-content {
+      width: $circle-size;
+      height: $circle-size;
+      border-radius: 50%;
+      background-color: $bg-spectator;
+      border: 2px solid $primary-color;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: $primary-color;
+    }
+  }
+
+  // Estado: Jugador (Rectángulo)
+  &.card--empty, &.card--selected {
+    .card-content {
+      width: $card-width;
+      height: $card-height;
+      border-radius: 8px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 2rem;
+      font-weight: bold;
+      transition: all 0.3s ease;
+    }
+  }
+
+  &.card--empty .card-content {
+    border: 2px dashed $border-color;
+    background-color: #f9f9f9;
+  }
+
+  &.card--selected .card-content {
+    border: 2px solid $primary-color;
+    background-color: white;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    color: $primary-color;
+  }
+
+  .player-name {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #333;
+  }
+}
