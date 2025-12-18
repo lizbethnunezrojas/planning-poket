@@ -1,6 +1,6 @@
 import { Component, ChangeDetectionStrategy, inject } from '@angular/core';
 import { Router } from '@angular/router';
-import { JoinGameFormComponent } from '../../../components/organisms/join-game-form.component';
+import { JoinGameFormComponent } from '../../../components/organisms/join-game-form/join-game-form.component';
 import { UserService } from '../../../core/services/user.service';
 import { ViewMode } from '../../../core/models/user.model';
 

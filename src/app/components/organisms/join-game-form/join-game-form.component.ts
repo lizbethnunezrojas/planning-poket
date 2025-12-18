@@ -6,12 +6,12 @@ import {
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
-import { FormField } from '../molecules/form-field/form-field.component';
-import { ModeSelectorGroupComponent } from '../molecules/mode-selector-group/mode-selector-group.component';
-import { ButtonComponent } from '../atoms/button/button.component';
-import { NameValidator, getNameErrorMessage  } from '../../core/validators/name.validator';
+import { FormField } from '../../molecules/form-field/form-field.component';
+import { ModeSelectorGroupComponent } from '../../molecules/mode-selector-group/mode-selector-group.component';
+import { ButtonComponent } from '../../atoms/button/button.component';
+import { NameValidator, getNameErrorMessage  } from '../../../core/validators/name.validator';
 
-import { ViewMode} from '../../core/models/user.model';
+import { ViewMode} from '../../../core/models/user.model';
 
 @Component({
   selector: 'app-join-game-form',
