@@ -11,14 +11,11 @@ import { GameService } from '../../../core/services/game.service';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CreateGamePage {
-
   private readonly gameService = inject(GameService);
-  // private readonly router = inject(Router); // Para la navegación futura
 
   public handleGameCreation(gameName: string): void {
-    
-    // 1. Lógica de Negocio: Llama al servicio para guardar los datos
     const gameId = this.gameService.createGame(gameName);
-    
+
     console.log(`[LÓGICA COMPLETADA] Partida creada y guardada. ID: ${gameId}`);
-}}
+  }
+}

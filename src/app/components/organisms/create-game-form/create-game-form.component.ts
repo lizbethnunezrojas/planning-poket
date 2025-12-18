@@ -1,10 +1,4 @@
-import {
-  Component,
-  ChangeDetectionStrategy,
-  EventEmitter,
-  Output,
-  inject,
-} from '@angular/core';
+import { Component, ChangeDetectionStrategy, EventEmitter, Output, inject } from '@angular/core';
 
 import {
   FormBuilder,
@@ -17,10 +11,7 @@ import {
 import { FormField } from '../../molecules/form-field/form-field.component';
 import { ButtonComponent } from '../../atoms/button/button.component';
 
-import {
-  NameValidator,
-  getNameErrorMessage,
-} from '../../../core/validators/name.validator';
+import { NameValidator, getNameErrorMessage } from '../../../core/validators/name.validator';
 
 interface CreateGameFormValues {
   name: string;

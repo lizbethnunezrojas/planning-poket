@@ -1,0 +1,9 @@
+<form [formGroup]="joinForm" (ngSubmit)="onSubmit() " class="join-game-container">
+  <app-form-field label="Tu nombre" [control]="userNameControl" [errorMessage]="userNameErrorMessage"></app-form-field>
+  
+
+  <app-mode-selector-group [control]="viewModeControl"> </app-mode-selector-group>
+
+  <app-button class="button-next" text="Continuar" type="submit" [disabled]="joinForm.invalid">
+  </app-button>
+</form>
