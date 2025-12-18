@@ -1,0 +1,62 @@
+$bg-dark: #12093a;
+$accent-purple: #bb65ff;
+
+.radio-container {
+  display: flex;
+  height: 21px;
+
+  .radio-label {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    gap: 15px;
+    position: relative;
+
+    .radio-input {
+      position: absolute;
+      opacity: 0;
+      cursor: pointer;
+
+      &:checked ~ .radio-circle {
+        border: $accent-purple 1px;
+        background-color: rgba($accent-purple, 0.2);
+        box-shadow: 0 0 2px $accent-purple, inset 0 0 2px $accent-purple;
+        height: 21px;
+        width: 21px;
+
+        &::after {
+          display: block;
+        }
+      }
+    }
+
+    .radio-circle {
+      height: 21px;
+      width: 21px;
+      box-sizing: border-box;
+
+      border: 1px solid $accent-purple;
+      border-radius: 50%;
+      position: relative;
+      transition: all 0.3s ease;
+      background-color: rgba($accent-purple, 0.3);
+
+      &::after {
+        content: '';
+        position: absolute;
+        display: none;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 10.5px;
+        height: 10.5px;
+        border-radius: 50%;
+        background: rgba($accent-purple, 0.7);
+      }
+    }
+
+    &:hover .radio-circle {
+      box-shadow: 0 0 10px rgba($accent-purple, 0.5);
+    }
+  }
+}

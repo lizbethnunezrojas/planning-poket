@@ -1,8 +1,19 @@
-.create-game-container{
+.join-game-container {
   display: flex;
   flex-direction: column;
-  justify-content: center;
   align-items: center;
-  height: 100vh;
-  gap: 31px;
+  justify-content: center;
+  width: 514px;
+  height: 294px;
+  background-color: #1f0d3f;
+  border-radius: 25px;
+  border: 1px solid #bb65ff;
+  box-shadow: 0 0 10px rgba(#bb65ff, 0.3), inset 0 0 10px rgba(#bb65ff, 0.2);
+  backdrop-filter: blur(10px);
+  box-sizing: border-box;
+  
+  .mode-selector-group{
+    margin-top: 19px;
+    margin-bottom: 45px;
+  }
 }
