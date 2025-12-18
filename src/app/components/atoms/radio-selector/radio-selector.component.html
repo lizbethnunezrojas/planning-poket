@@ -1,12 +1,11 @@
 <div class="radio-container">
-  <input
-    type="radio"
-    [id]="id"
-    [value]="value"
-    [formControl]="control" 
-    class="radio-input"
-  />
-  <label [for]="id" class="radio-label">
+  <label class="radio-label"> <input
+      type="radio"
+      [name]="name"
+      [value]="value"
+      [formControl]="control" 
+      class="radio-input"
+    />
     <span class="radio-circle"></span>
     <span class="label-text">{{ label }}</span>
   </label>

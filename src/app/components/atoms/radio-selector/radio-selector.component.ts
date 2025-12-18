@@ -15,4 +15,5 @@ export class RadioSelectorComponent {
   @Input({ required: true }) id!: string;
   @Input({ required: true }) value!: string;
   @Input({ required: true }) label!: string;
+  @Input({ required: true }) name!: string;
 }
