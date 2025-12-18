@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { CreateGameForm } from '../../../components/organisms/create-game-form/create-game-form.component';
 import { GameService } from '../../../core/services/game.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-create-game-page',
@@ -11,11 +12,12 @@ import { GameService } from '../../../core/services/game.service';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CreateGamePage {
+  private readonly router = inject(Router);
   private readonly gameService = inject(GameService);
 
   public handleGameCreation(gameName: string): void {
-    const gameId = this.gameService.createGame(gameName);
+    this.gameService.createGame(gameName);
 
-    console.log(`[LÓGICA COMPLETADA] Partida creada y guardada. ID: ${gameId}`);
+    this.router.navigate(['/join']);
   }
 }
