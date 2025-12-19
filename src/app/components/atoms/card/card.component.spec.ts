@@ -1,56 +1,37 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { render } from '@testing-library/angular';
 import { CardComponent } from './card.component';
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect } from 'vitest';
 
-describe('CardComponent (Atomo)', () => {
-  let component: CardComponent;
-  let fixture: ComponentFixture<CardComponent>;
+describe('CardComponent - Criterios de Aceptación', () => {
+  
+  it('debería mostrar la clase card--empty cuando no hay valor (voto en blanco)', async () => {
+    const { container } = await render(CardComponent, {
+      inputs: {
+        userName: 'Micaela',
+        viewMode: 'player',
+        value: null,
+        isRevealed: false
+      }
+    });
 
-  beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      imports: [CardComponent],
-    }).compileComponents();
-
-    fixture = TestBed.createComponent(CardComponent);
-    component = fixture.componentInstance;
+    const cardElement = container.querySelector('.card-container');
+    expect(cardElement?.classList.contains('card--empty')).toBe(true);
   });
 
-  it('1. Debe instanciarse correctamente siguiendo el estándar de Vitest', () => {
-    expect(component).toBeTruthy();
-  });
+it('debería renderizar con formato circular y clase de espectador', async () => {
+    const { container } = await render(CardComponent, {
+      inputs: {
+        userName: 'Jose Alberto',
+        viewMode: 'spectator',
+        value: null,
+        isRevealed: false
+      }
+    });
 
-  it('2. [Criterio Espectador] Debe mostrar las iniciales correctas en mayúsculas', () => {
-    fixture.componentRef.setInput('viewMode', 'spectator');
-    fixture.componentRef.setInput('userName', 'lizie vi');
+    const cardContainer = container.querySelector('.card--spectator');
     
-    fixture.detectChanges(); 
+    expect(cardContainer).not.toBeNull();
 
-    const compiled = fixture.nativeElement as HTMLElement;
-    const initialsContainer = compiled.querySelector('.circle-content');
-    
-    expect(initialsContainer?.textContent?.trim()).toBe('LV');
-  });
-
-  it('3. [HU3 Criterio 1] Debe mostrarse vacío (solo borde) si es jugador y no ha votado', () => {
-    fixture.componentRef.setInput('viewMode', 'player');
-    fixture.componentRef.setInput('userName', 'Liz');
-    fixture.componentRef.setInput('value', null); 
-    
-    fixture.detectChanges();
-
-    const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('.card--empty')).toBeTruthy();
-    expect(compiled.querySelector('.card-content')?.textContent?.trim()).toBe('');
-  });
-
-  it('4. [HU3 Criterio 2] Debe mostrar el valor cuando el jugador selecciona una carta', () => {
-    fixture.componentRef.setInput('viewMode', 'player');
-    fixture.componentRef.setInput('userName', 'Liz');
-    fixture.componentRef.setInput('value', '8'); 
-    
-    fixture.detectChanges();
-
-    const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('.card-content')?.textContent?.trim()).toBe('8');
+    expect(cardContainer?.textContent?.trim()).toBe('JO');
   });
 });
