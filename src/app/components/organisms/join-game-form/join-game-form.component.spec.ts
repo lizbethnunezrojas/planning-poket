@@ -26,7 +26,6 @@ describe('JoinGamePage', () => {
     component = fixture.componentInstance;
     userService = TestBed.inject(UserService);
     
-    // Limpiamos el localStorage antes de cada test 
     localStorage.clear();
     fixture.detectChanges();
   });

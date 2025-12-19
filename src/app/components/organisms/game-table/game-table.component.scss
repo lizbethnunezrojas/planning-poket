@@ -18,6 +18,28 @@
     align-items: center;
   }
 
+  .empty-seat {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 4px;
+    .placeholder-card {
+      border-radius: 7px;
+      border: #bb65ff solid 1px;
+      width: 35px;
+      height: 60px;
+      font-size: 16px;
+      box-shadow: 0 0 5px #6429cd99;
+      background-color: #9d9da199;
+    }
+
+    .placeholder-label {
+      text-align: center;
+      font-size: 14px;
+    }
+  }
+
   .seat-1 {
     grid-area: 1 / 2;
   }

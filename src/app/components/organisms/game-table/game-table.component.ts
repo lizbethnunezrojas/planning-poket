@@ -14,15 +14,28 @@ import { User } from '../../../core/models/user.model';
 export class GameTableComponent {
   players = input.required<User[]>();
   tableRevealed = input<boolean>(false);
+  currentUserId = input.required<string>();
+
+  readonly SEAT_ORDER = [1, 2, 3, 4, 5, 6, 7, 8];
+  readonly TARGET_SEAT_ID = 7;
 
   playersInSeats = computed(() => {
     const seats: Record<number, User> = {};
-    const seatOrder = [1, 2, 3, 4, 5, 6, 7, 8];
+    const allPlayers = this.players();
+    const myId = this.currentUserId();
 
-    this.players().forEach((player, index) => {
-      if (index < seatOrder.length) {
-        seats[seatOrder[index]] = player;
-      }
+    const myIndex = allPlayers.findIndex(p => p.id === myId);
+
+    const targetIndex = this.SEAT_ORDER.indexOf(this.TARGET_SEAT_ID); 
+    const shift = myIndex >= 0 ? (targetIndex - myIndex) : 0;
+
+    allPlayers.forEach((player, index) => {
+      let seatIndex = (index + shift) % 8;
+
+      if (seatIndex < 0) seatIndex += 8;
+
+      const seatId = this.SEAT_ORDER[seatIndex];
+      seats[seatId] = player;
     });
 
     return seats;

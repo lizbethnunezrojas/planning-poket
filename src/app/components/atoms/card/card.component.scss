@@ -10,6 +10,8 @@
   .card-container {
     border-radius: 7px;
     border: #bb65ff solid 1px;
+    width: 35px;
+    height: 60px;
 
     &.card--spectator {
       display: flex;
@@ -26,15 +28,11 @@
     }
 
     &.card--empty {
-      width: 35px;
-      height: 60px;
       font-size: 16px;
       box-shadow: 0 0 5px #6429cd99;
     }
 
     &.card--revealed {
-      width: 35px;
-      height: 60px;
       font-weight: 600px;
       font-size: 16px;
       border: #bb65ff solid 1px;
@@ -45,8 +43,6 @@
     }
 
     &.card--hidden {
-      width: 35px;
-      height: 60px;
       box-shadow: 0 0 4px #bdbdff99;
       display: flex;
       background-color: #bb65ff;

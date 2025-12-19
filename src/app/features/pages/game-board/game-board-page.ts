@@ -37,8 +37,6 @@ export class GameBoardPage implements OnInit {
       { id: '3', name: 'Micaela 3', viewMode: 'player', gameId: gameIdFromUrl, role: 'player', hasSelectedCard: true, selectedCard: '' },
       { id: '4', name: 'Micaela 4', viewMode: 'player', gameId: gameIdFromUrl, role: 'player', hasSelectedCard: true, selectedCard: '8' },
       { id: '5', name: 'Micaela 5', viewMode: 'player', gameId: gameIdFromUrl, role: 'player', hasSelectedCard: true, selectedCard: '8' },
-      { id: '6', name: 'Jose 6', viewMode: 'spectator', gameId: gameIdFromUrl, role: 'player', hasSelectedCard: false, selectedCard: null },
-      { id: '7', name: 'Ana 7', viewMode: 'player', gameId: gameIdFromUrl, role: 'admin', hasSelectedCard: false, selectedCard: null },
       user 
     ];
 
