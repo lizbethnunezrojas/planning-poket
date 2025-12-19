@@ -1,0 +1,25 @@
+<div class="grid-container">
+  <div class="table-center">
+    <app-game-table-design>
+      <span class="table-label">
+        <p>Revelar cartas</p>
+        <p>Contando votos</p>
+        <p>Nueva votación</p>
+      </span>
+    </app-game-table-design>
+  </div>
+
+  @for (seatId of [1, 2, 3, 4, 5, 6, 7, 8]; track seatId) {
+  <div [class]="'seat-' + seatId">
+    @if (playersInSeats()[seatId]; as player) {
+    <app-card
+      [userName]="player.name"
+      [viewMode]="player.viewMode"
+      [value]="player.selectedCard ?? null"
+      [isRevealed]="tableRevealed()"
+    >
+    </app-card>
+    }
+  </div>
+  }
+</div>

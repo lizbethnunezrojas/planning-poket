@@ -20,28 +20,25 @@ describe('CardComponent (Atomo)', () => {
   });
 
   it('2. [Criterio Espectador] Debe mostrar las iniciales correctas en mayúsculas', () => {
-    // Simulamos la entrada de datos desde la página
     fixture.componentRef.setInput('viewMode', 'spectator');
     fixture.componentRef.setInput('userName', 'lizie vi');
     
-    fixture.detectChanges(); // Refrescamos el componente
+    fixture.detectChanges(); 
 
     const compiled = fixture.nativeElement as HTMLElement;
     const initialsContainer = compiled.querySelector('.circle-content');
     
-    // Verificamos lógica de negocio: "lizie vi" -> "LV"
     expect(initialsContainer?.textContent?.trim()).toBe('LV');
   });
 
   it('3. [HU3 Criterio 1] Debe mostrarse vacío (solo borde) si es jugador y no ha votado', () => {
     fixture.componentRef.setInput('viewMode', 'player');
     fixture.componentRef.setInput('userName', 'Liz');
-    fixture.componentRef.setInput('value', null); // Sin carta seleccionada
+    fixture.componentRef.setInput('value', null); 
     
     fixture.detectChanges();
 
     const compiled = fixture.nativeElement as HTMLElement;
-    // Buscamos la clase que definimos para el estado vacío
     expect(compiled.querySelector('.card--empty')).toBeTruthy();
     expect(compiled.querySelector('.card-content')?.textContent?.trim()).toBe('');
   });

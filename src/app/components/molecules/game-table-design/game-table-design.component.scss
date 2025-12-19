@@ -1,24 +1,25 @@
 .table-m {
   width: 603px;
   height: 345px;
-  border: 2px #6429cd solid; 
+  border: 2px #6429cd solid;
   display: flex;
   justify-content: center;
   align-items: center;
   border-radius: 276px;
-  box-shadow: 0 0 2px #BDBDFF33;
+  box-shadow: 0 0 2px #bdbdff33;
   box-sizing: border-box;
 
-  .table-s { 
+  .table-s {
     width: 555px;
     height: 298px;
-    border: 2px #BDBDFF99 solid;
+    border: 2px #bdbdff99 solid;
     display: flex;
     justify-content: center;
     align-items: center;
     border-radius: 276px;
-    box-shadow: 0 0 3px #BDBDFF99;
-    background-color: transparent; 
+    box-shadow: 0 0 3px #bdbdff99;
+    background-color: transparent;
+    box-sizing: border-box;
 
     .table-xs {
       width: 521px;
@@ -29,9 +30,8 @@
       align-items: center;
       border-radius: 276px;
       box-shadow: 0 0 3px rgba(255, 255, 255, 0.6);
-      background-color: #1F0D3F99;
+      background-color: #1f0d3f99;
       box-sizing: border-box;
-    
     }
   }
 }

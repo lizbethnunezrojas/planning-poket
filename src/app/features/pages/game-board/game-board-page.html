@@ -1,23 +1,15 @@
 <div class="game-layout">
-  <h1>Mesa de Votación</h1>
-
   @if (currentUser(); as user) {
-    <div class="table-container">
-      <app-card 
-        [viewMode]="user.viewMode" 
-        [userName]="user.name" 
-        [value]="user.selectedCard || null">
-      </app-card>
-    </div>
 
-    <div class="action-area">
-      @if (user.viewMode === 'player') {
-        <p>Selecciona tu carta para votar:</p>
-        } @else {
-        <p>Estás en modo espectador. Observando la partida...</p>
-      }
-    </div>
+    <app-game-table [players]="allPlayers()" [tableRevealed]="isTableRevealed()"></app-game-table>
+
+    <section class="voting-section">
+      <p>Seccion de cartas a elegir por el jugador</p>
+    </section>
+
   } @else {
-    <p>Cargando datos del jugador...</p>
+    <div class="loading-container">
+      <p>Cargando mesa de juego...</p>
+    </div>
   }
 </div>

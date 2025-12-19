@@ -1,12 +1,10 @@
-<div [class]="['card-container', cardClass()]">
-  @if (viewMode() === 'spectator') {
-    <div class="circle-content">
-      {{ initials() }}
-    </div>
-  } @else {
-    <div class="card-content">
-      {{ value() || '' }}
-    </div>
-  }
+<div class="card-box">
+  <div [class]="['card-container', cardClass()]">
+    @if (viewMode() === 'spectator') {
+    {{ initials() }}
+    } @else { @if (value() && isRevealed()) {
+    {{ value() }}
+    } }
+  </div>
+  <span class="player-name">{{ formattedName() }}</span>
 </div>
-<span class="player-name">{{ userName() }}</span>
