@@ -5,13 +5,12 @@ import { describe, it, expect } from 'vitest';
 
 describe.skip('GameTableComponent - Criterios de Aceptación', () => {
 
-  // 1. Declaramos el mock con el tipo User[] explícitamente
   const mockPlayers: User[] = [
     { 
       id: '1', 
       name: 'micaela r', 
       viewMode: 'player', 
-      role: 'player', // TypeScript ahora sabe que esto es UserRole
+      role: 'player', 
       selectedCard: '5', 
       hasSelectedCard: true, 
       gameId: '123' 
@@ -28,7 +27,6 @@ describe.skip('GameTableComponent - Criterios de Aceptación', () => {
   ];
 
   it('debería mostrar a todos los jugadores y formatear sus nombres', async () => {
-    // 2. Ahora al pasar mockPlayers, el tipo coincidirá perfectamente
     await render(GameTableComponent, {
       componentInputs: {
         players: mockPlayers,

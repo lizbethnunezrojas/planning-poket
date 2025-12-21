@@ -2,7 +2,7 @@
   display: grid;
   grid-template-columns: repeat(5, 1fr);
   grid-template-rows: repeat(5, 1fr);
-  width: 1005px;
+  width: 955px;
   height: 655px;
   margin: 0 auto;
   align-items: center;
@@ -29,6 +29,8 @@
       border: #bb65ff solid 1px;
       width: 35px;
       height: 60px;
+      box-sizing: border-box;
+
       font-size: 16px;
       box-shadow: 0 0 5px #6429cd99;
       background-color: #9d9da199;

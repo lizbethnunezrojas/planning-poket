@@ -1,6 +1,7 @@
 import { Component, input, computed, ChangeDetectionStrategy } from '@angular/core';
 import { GameTableDesignComponent } from '../../molecules/game-table-design/game-table-design.component';
 import { CardComponent } from '../../atoms/card/card.component';
+
 import { User } from '../../../core/models/user.model';
 
 @Component({

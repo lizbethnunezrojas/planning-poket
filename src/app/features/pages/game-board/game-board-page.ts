@@ -3,11 +3,12 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { UserService } from '../../../core/services/user.service';
 import { User } from '../../../core/models/user.model';
 import { GameTableComponent } from '../../../components/organisms/game-table/game-table.component';
+import { CardDeckComponent } from '../../../components/organisms/CardDeckComponent/card-deck.component';
 
 @Component({
   selector: 'app-game-board-page',
   standalone: true,
-  imports: [GameTableComponent],
+  imports: [GameTableComponent, CardDeckComponent],
   templateUrl: './game-board-page.html',
   styleUrls: ['./game-board-page.scss'],
 })

@@ -9,13 +9,15 @@ import { ViewMode } from '../../../core/models/user.model';
 })
 export class CardComponent {
   @HostBinding('attr.viewMode') get mode() {
-    return this.viewMode;
+    return this.viewMode();
   }
 
-  viewMode = input.required<ViewMode>();
+  viewMode = input<ViewMode>('player');
   value = input<string | null>(null);
-  userName = input.required<string>();
+  userName = input<string>('');
   isRevealed = input<boolean>(false);
+
+  isSelected = input<boolean>(false);
 
   formattedName = computed(() => {
     const name = this.userName().trim();
@@ -38,6 +40,7 @@ export class CardComponent {
   );
 
   cardClass = computed(() => {
+    if (this.isSelected()) return 'card--selected';
     if (this.viewMode() === 'spectator') return 'card--spectator';
 
     const hasVoted = !!this.value();

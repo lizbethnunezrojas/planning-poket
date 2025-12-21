@@ -7,11 +7,14 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  box-sizing: border-box;
+
   .card-container {
     border-radius: 7px;
     border: #bb65ff solid 1px;
     width: 35px;
     height: 60px;
+    box-sizing: border-box;
 
     &.card--spectator {
       display: flex;
@@ -25,11 +28,13 @@
       font-size: 21px;
       font-weight: bold;
       border: none;
+      box-sizing: border-box;
     }
 
     &.card--empty {
       font-size: 16px;
       box-shadow: 0 0 5px #6429cd99;
+      box-sizing: border-box;
     }
 
     &.card--revealed {
@@ -40,12 +45,14 @@
       display: flex;
       justify-content: center;
       align-items: center;
+      box-sizing: border-box;
     }
 
     &.card--hidden {
       box-shadow: 0 0 4px #bdbdff99;
       display: flex;
       background-color: #bb65ff;
+      box-sizing: border-box;
     }
   }
   .player-name {

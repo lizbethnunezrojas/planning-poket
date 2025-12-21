@@ -1,15 +1,17 @@
 <div class="game-layout">
   @if (currentUser(); as user) {
 
-    <app-game-table [players]="allPlayers()" [tableRevealed]="isTableRevealed()" [currentUserId]="user.id"></app-game-table>
+  <app-game-table
+    [players]="allPlayers()"
+    [tableRevealed]="isTableRevealed()"
+    [currentUserId]="user.id"
+  ></app-game-table>
 
-    <section class="voting-section">
-      <p>Seccion de cartas a elegir por el jugador</p>
-    </section>
+  <app-card-deck></app-card-deck>
 
   } @else {
-    <div class="loading-container">
-      <p>Cargando mesa de juego...</p>
-    </div>
+  <div class="loading-container">
+    <p>Cargando mesa de juego...</p>
+  </div>
   }
 </div>
