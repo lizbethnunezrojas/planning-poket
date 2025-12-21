@@ -16,13 +16,13 @@ export const routes: Routes = [
 
   {
     path: 'join/:id',
-    canActivate: [authGuard],
     loadComponent: () =>
       import('./features/pages/join-game/join-game-page').then((m) => m.JoinGamePage),
   },
 
   {
     path: 'game/:id',
+    canActivate: [authGuard],
     loadComponent: () =>
       import('./features/pages/game-board/game-board-page').then((m) => m.GameBoardPage),
   },

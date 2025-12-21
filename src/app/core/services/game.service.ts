@@ -10,12 +10,12 @@ export class GameService {
   private readonly USER_KEY = 'planning_poker_user';
 
   private generateUniqueId(): string {
-  return Math.random().toString(36).substring(2, 9).toUpperCase();
-}
+    return Math.random().toString(36).substring(2, 9).toUpperCase();
+  }
 
   private readonly gameSignal = signal<Game | null>(this.loadGameFromStorage());
   private readonly currentUserSignal = signal<User | null>(this.loadUserFromStorage());
-  private readonly playersSignal = signal<User[]>([]); 
+  private readonly playersSignal = signal<User[]>([]);
 
   public currentGame = this.gameSignal.asReadonly();
   public currentUser = this.currentUserSignal.asReadonly();
@@ -27,24 +27,32 @@ export class GameService {
     this.mockPlayers();
   }
 
-  public createGame(gameName: string, userName: string): void {
+  public createGame(gameName: string): void {
     const gameId = this.generateUniqueId();
     const newGame: Game = { id: gameId, name: gameName };
-    
-    const newUser: User = {
-      id: this.generateUniqueId(), 
-      name: userName,
-      role: 'player',
-      viewMode: 'player',
-      selectedCard: null,
-      hasSelectedCard: false,
-      gameId: gameId
-    };
 
     this.gameSignal.set(newGame);
-    this.currentUserSignal.set(newUser);
 
     localStorage.setItem(this.STORAGE_KEY, JSON.stringify(newGame));
+  }
+
+  public registerUser(userName: string, viewMode: 'player' | 'spectator'): void {
+    const currentGame = this.gameSignal();
+    if (!currentGame) return;
+
+    const role = this.currentUserSignal() ? 'player' : 'admin';
+
+    const newUser: User = {
+      id: this.generateUniqueId(),
+      name: userName,
+      role: role,
+      viewMode: viewMode,
+      selectedCard: null,
+      hasSelectedCard: false,
+      gameId: currentGame.id,
+    };
+
+    this.currentUserSignal.set(newUser);
     localStorage.setItem(this.USER_KEY, JSON.stringify(newUser));
   }
 
@@ -60,8 +68,24 @@ export class GameService {
 
   private mockPlayers() {
     this.playersSignal.set([
-      { id: '2', name: 'Alonso Q', role: 'player', viewMode: 'player', selectedCard: null, hasSelectedCard: false, gameId: 'mock' },
-      { id: '3', name: 'Micaela R', role: 'player', viewMode: 'player', selectedCard: null, hasSelectedCard: false, gameId: 'mock' },
+      {
+        id: '2',
+        name: 'Alonso Q',
+        role: 'player',
+        viewMode: 'player',
+        selectedCard: null,
+        hasSelectedCard: false,
+        gameId: 'mock',
+      },
+      {
+        id: '3',
+        name: 'Micaela R',
+        role: 'player',
+        viewMode: 'player',
+        selectedCard: null,
+        hasSelectedCard: false,
+        gameId: 'mock',
+      },
     ]);
   }
 }

@@ -5,15 +5,14 @@ import { GameService } from '../services/game.service';
 export const authGuard: CanActivateFn = (route, state) => {
   const gameService = inject(GameService);
   const router = inject(Router);
-  
+
   const gameIdFromUrl = route.params['id'];
   const currentGame = gameService.currentGame();
+  const currentUser = gameService.currentUser();
 
-  if (gameService.isGameReady() && currentGame?.id === gameIdFromUrl) {
-    return true; 
+  if (currentGame?.id === gameIdFromUrl && currentUser) {
+    return true;
   }
-
-  console.warn('[AuthGuard] Acceso denegado. Redirigiendo según contexto...');
 
   if (gameIdFromUrl) {
     return router.parseUrl(`/join/${gameIdFromUrl}`);
