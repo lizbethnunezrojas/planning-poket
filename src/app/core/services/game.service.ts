@@ -12,7 +12,20 @@ export class GameService {
   private readonly gameSignal = signal<Game | null>(this.loadGameFromStorage());
   private readonly currentUserSignal = signal<User | null>(this.loadUserFromStorage());
   private readonly playersSignal = signal<User[]>([]);
-  private readonly availableCardsSignal = signal<(number | string)[]>([0, 1, 3, 5, 8, 13, 21, 34, 55, 89, '?', '☕']);
+  private readonly availableCardsSignal = signal<(number | string)[]>([
+    0,
+    1,
+    3,
+    5,
+    8,
+    13,
+    21,
+    34,
+    55,
+    89,
+    '?',
+    '☕',
+  ]);
   public availableCards = this.availableCardsSignal.asReadonly();
 
   public currentGame = this.gameSignal.asReadonly();
@@ -22,7 +35,39 @@ export class GameService {
   public isGameReady = computed(() => !!this.gameSignal() && !!this.currentUserSignal());
 
   constructor() {
-    this.mockPlayers();
+    this.initializePlayers();
+  }
+
+  private initializePlayers(): void {
+    const savedUser = this.loadUserFromStorage();
+    const savedGame = this.loadGameFromStorage();
+
+    const playersList: User[] = [
+      {
+        id: '2',
+        name: 'Alonso Q',
+        role: 'player',
+        viewMode: 'player',
+        selectedCard: null,
+        hasSelectedCard: false,
+        gameId: 'mock',
+      },
+      {
+        id: '3',
+        name: 'Micaela R',
+        role: 'player',
+        viewMode: 'player',
+        selectedCard: null,
+        hasSelectedCard: false,
+        gameId: 'mock',
+      },
+    ];
+
+    if (savedUser && savedGame && savedUser.gameId === savedGame.id) {
+      playersList.push(savedUser);
+    }
+
+    this.playersSignal.set(playersList);
   }
 
   private generateUniqueId(): string {
@@ -36,18 +81,21 @@ export class GameService {
     this.gameSignal.set(newGame);
 
     localStorage.setItem(this.STORAGE_KEY, JSON.stringify(newGame));
+
+    this.currentUserSignal.set(null);
+    localStorage.removeItem(this.USER_KEY);
+
+    this.mockPlayers();
   }
 
   public registerUser(userName: string, viewMode: 'player' | 'spectator'): void {
     const currentGame = this.gameSignal();
     if (!currentGame) return;
 
-    const role = this.currentUserSignal() ? 'player' : 'admin';
-
     const newUser: User = {
       id: this.generateUniqueId(),
       name: userName,
-      role: role,
+      role: this.currentUserSignal() ? 'player' : 'admin',
       viewMode: viewMode,
       selectedCard: null,
       hasSelectedCard: false,
@@ -56,15 +104,18 @@ export class GameService {
 
     this.currentUserSignal.set(newUser);
     localStorage.setItem(this.USER_KEY, JSON.stringify(newUser));
+
+    this.playersSignal.update((players) => [...players, newUser]);
   }
 
   public selectCard(value: string | number): void {
+    const cardValue = value.toString();
     this.currentUserSignal.update((user) => {
       if (!user) return null;
 
       const updatedUser = {
         ...user,
-        selectedCard: value.toString(),
+        selectedCard: cardValue,
         hasSelectedCard: true,
       };
 
@@ -72,6 +123,14 @@ export class GameService {
 
       return updatedUser;
     });
+
+    this.playersSignal.update((players) =>
+      players.map((p) =>
+        p.id === this.currentUserSignal()?.id
+          ? { ...p, selectedCard: cardValue, hasSelectedCard: true }
+          : p
+      )
+    );
   }
 
   private loadGameFromStorage(): Game | null {

@@ -1,8 +1,9 @@
-import { Component, input, computed, ChangeDetectionStrategy } from '@angular/core';
+import { Component, input, computed, ChangeDetectionStrategy, inject } from '@angular/core';
 import { GameTableDesignComponent } from '../../molecules/game-table-design/game-table-design.component';
 import { CardComponent } from '../../atoms/card/card.component';
 
 import { User } from '../../../core/models/user.model';
+import { GameService } from '../../../core/services/game.service';
 
 @Component({
   selector: 'app-game-table',
@@ -13,9 +14,12 @@ import { User } from '../../../core/models/user.model';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class GameTableComponent {
-  players = input.required<User[]>();
+  private readonly gameService = inject(GameService);
+
   tableRevealed = input<boolean>(false);
-  currentUserId = input.required<string>();
+
+  private readonly players = this.gameService.players;
+  private readonly currentUser = this.gameService.currentUser;
 
   readonly SEAT_ORDER = [1, 2, 3, 4, 5, 6, 7, 8];
   readonly TARGET_SEAT_ID = 7;
@@ -23,12 +27,14 @@ export class GameTableComponent {
   playersInSeats = computed(() => {
     const seats: Record<number, User> = {};
     const allPlayers = this.players();
-    const myId = this.currentUserId();
+    const currentU = this.currentUser();
 
-    const myIndex = allPlayers.findIndex(p => p.id === myId);
+    if (!currentU || allPlayers.length === 0) return seats;
+    const myId = currentU.id;
+    const myIndex = allPlayers.findIndex((p) => p.id === myId);
 
-    const targetIndex = this.SEAT_ORDER.indexOf(this.TARGET_SEAT_ID); 
-    const shift = myIndex >= 0 ? (targetIndex - myIndex) : 0;
+    const targetIndex = this.SEAT_ORDER.indexOf(this.TARGET_SEAT_ID);
+    const shift = myIndex >= 0 ? targetIndex - myIndex : 0;
 
     allPlayers.forEach((player, index) => {
       let seatIndex = (index + shift) % 8;

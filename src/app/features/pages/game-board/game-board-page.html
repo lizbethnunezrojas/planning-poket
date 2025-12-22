@@ -1,11 +1,7 @@
 <div class="game-layout">
   @if (currentUser(); as user) {
 
-  <app-game-table
-    [players]="allPlayers()"
-    [tableRevealed]="isTableRevealed()"
-    [currentUserId]="user.id"
-  ></app-game-table>
+  <app-game-table [tableRevealed]="false"></app-game-table>
 
   <app-card-deck></app-card-deck>
 
