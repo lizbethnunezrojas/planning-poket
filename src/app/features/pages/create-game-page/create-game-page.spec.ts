@@ -1,23 +1,32 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
-
+import { render, screen} from '@testing-library/angular';
 import { CreateGamePage } from './create-game-page';
+import { GameService } from '../../../core/services/game.service';
+import { Router } from '@angular/router';
+import { vi, describe, it, expect } from 'vitest';
 
-describe('CreateGamePage', () => {
-  let component: CreateGamePage;
-  let fixture: ComponentFixture<CreateGamePage>;
+describe('CreateGamePage - Orquestación HU1', () => {
+  
+  const mockGameService = {
+    createGame: vi.fn()
+  };
+  
+  const mockRouter = {
+    navigate: vi.fn()
+  };
 
-  beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      imports: [CreateGamePage]
-    })
-    .compileComponents();
+  const setup = async () => {
+    return await render(CreateGamePage, {
+      providers: [
+        { provide: GameService, useValue: mockGameService },
+        { provide: Router, useValue: mockRouter }
+      ]
+    });
+  };
 
-    fixture = TestBed.createComponent(CreateGamePage);
-    component = fixture.componentInstance;
-    await fixture.whenStable();
+  it('debería renderizar correctamente el título y el formulario', async () => {
+    await setup();
+    expect(screen.getByText(/Crear partida/i)).toBeTruthy();
+    expect(screen.getByRole('textbox')).toBeTruthy();
   });
 
-  it('should create', () => {
-    expect(component).toBeTruthy();
-  });
 });

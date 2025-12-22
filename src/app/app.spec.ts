@@ -1,17 +1,27 @@
-import { TestBed } from '@angular/core/testing';
+import { render} from '@testing-library/angular';
 import { App } from './app';
+import { provideRouter } from '@angular/router';
+import { describe, it, expect } from 'vitest';
 
-describe('App', () => {
-  beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      imports: [App],
-    }).compileComponents();
-  });
+describe('AppComponent (Raíz)', () => {
+  
+  const setup = async () => {
+    return await render(App, {
+      providers: [
+        provideRouter([]) 
+      ]
+    });
+  };
 
-  it('should create the app', () => {
-    const fixture = TestBed.createComponent(App);
+  it('debería crear la aplicación correctamente', async () => {
+    const { fixture } = await setup();
     const app = fixture.componentInstance;
     expect(app).toBeTruthy();
   });
 
+  it('debería contener el contenedor principal de navegación (router-outlet)', async () => {
+    const { container } = await setup();
+    const outlet = container.querySelector('router-outlet');
+    expect(outlet).not.toBeNull();
+  });
 });

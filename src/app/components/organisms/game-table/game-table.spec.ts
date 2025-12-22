@@ -1,41 +1,26 @@
 import { render, screen } from '@testing-library/angular';
 import { GameTableComponent } from './game-table.component';
-import { User } from '../../../core/models/user.model';
-import { describe, it, expect } from 'vitest';
+import { GameService } from '../../../core/services/game.service';
+import { signal } from '@angular/core';
 
-describe.skip('GameTableComponent - Criterios de Aceptación', () => {
-
-  const mockPlayers: User[] = [
-    { 
-      id: '1', 
-      name: 'micaela r', 
-      viewMode: 'player', 
-      role: 'player', 
-      selectedCard: '5', 
-      hasSelectedCard: true, 
-      gameId: '123' 
-    },
-    { 
-      id: '2', 
-      name: 'alonso q', 
-      viewMode: 'player', 
-      role: 'player', 
-      selectedCard: null, 
-      hasSelectedCard: false, 
-      gameId: '123' 
-    }
+describe('GameTableComponent - HU4', () => {
+  const mockPlayers = [
+    { id: '1', name: 'micaela r', viewMode: 'player', selectedCard: '5' }
   ];
 
-  it('debería mostrar a todos los jugadores y formatear sus nombres', async () => {
+  it('debería mostrar a los jugadores desde el servicio', async () => {
     await render(GameTableComponent, {
-      componentInputs: {
-        players: mockPlayers,
-        currentUserId: '1',
-        tableRevealed: false
-      }
+      providers: [
+        {
+          provide: GameService,
+          useValue: {
+            players: signal(mockPlayers),
+            currentUser: signal(mockPlayers[0])
+          }
+        }
+      ]
     });
 
-    expect(screen.getByText('Micaela R')).toBeDefined();
-    expect(screen.getByText('Alonso Q')).toBeDefined();
+    expect(screen.getByText('Micaela R')).toBeTruthy();
   });
 });

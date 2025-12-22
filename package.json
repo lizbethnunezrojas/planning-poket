@@ -39,8 +39,11 @@
     "@testing-library/angular": "^18.1.1",
     "@testing-library/dom": "^10.4.1",
     "@testing-library/user-event": "^14.6.1",
-    "jsdom": "^27.1.0",
+    "@types/node": "^25.0.3",
+    "@vitest/browser": "^4.0.16",
+    "@vitest/ui": "^4.0.16",
+    "jsdom": "^27.3.0",
     "typescript": "~5.9.2",
-    "vitest": "^4.0.8"
+    "vitest": "^4.0.16"
   }
 }

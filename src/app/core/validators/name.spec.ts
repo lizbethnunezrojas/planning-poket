@@ -1,51 +1,48 @@
 import { FormControl } from '@angular/forms';
 import { NameValidator } from './name.validator';
+import { describe, it, expect, beforeEach } from 'vitest';
 
-describe.skip('GameNameValidator', () => {
-  const control = new FormControl('', NameValidator);
+describe('NameValidator - Pruebas de Lógica Pura', () => {
+  let control: FormControl;
 
-  // Exito
+  beforeEach(() => {
+    control = new FormControl('');
+  });
 
-  it('debe ser VÁLIDO para nombres que cumplen todas las reglas (ej: MiPartida001)', () => {
+  // ESCENARIOS DE ÉXITO 
+
+  it('debería ser VÁLIDO si cumple todas las reglas (ej: MiPartida001)', () => {
     control.setValue('MiPartida001');
-    expect(control.errors).toBeNull(); 
+    const result = NameValidator(control);
+    expect(result).toBeNull(); 
   });
   
-  it('debe ser VÁLIDO con solo un número (ej: Partida1)', () => {
-    control.setValue('Partida1');
-    expect(control.errors).toBeNull();
-  });
-  
-  it('debe ser VÁLIDO con el máximo de 3 números (ej: Partida123)', () => {
+  it('debería ser VÁLIDO con el máximo permitido de 3 números (ej: Partida123)', () => {
     control.setValue('Partida123');
-    expect(control.errors).toBeNull();
+    const result = NameValidator(control);
+    expect(result).toBeNull();
   });
 
-  // Error
+  // ESCENARIOS DE ERROR 
 
-  it('debe ser INVÁLIDO si contiene el caracter especial _', () => {
+  it('debería ser INVÁLIDO si contiene caracteres especiales (ej: _ o /)', () => {
     control.setValue('Partida_Test');
-    expect(control.errors).toEqual({ invalidSpecialChars: true });
-  });
+    expect(NameValidator(control)).toEqual({ invalidSpecialChars: true });
 
-  it('debe ser INVÁLIDO si contiene el caracter especial /', () => {
     control.setValue('Partida/Test');
-    expect(control.errors).toEqual({ invalidSpecialChars: true });
+    expect(NameValidator(control)).toEqual({ invalidSpecialChars: true });
   });
 
-  it('debe ser INVÁLIDO si contiene más de 3 números (ej: Partida1234)', () => {
+  it('debería ser INVÁLIDO si excede el límite de 3 números (ej: Partida1234)', () => {
     control.setValue('Partida1234');
-    expect(control.errors).toEqual({ tooManyNumbers: true });
+    expect(NameValidator(control)).toEqual({ tooManyNumbers: true });
   });
 
-  it('debe ser INVÁLIDO si contiene espacios al comienzo', () => {
+  it('debería ser INVÁLIDO si contiene espacios al inicio o solo espacios', () => {
     control.setValue(' Partida12');
-    expect(control.errors).toEqual({ invalidSpaces: true });
-  });
+    expect(NameValidator(control)).toEqual({ invalidSpaces: true });
 
-  it('debe ser INVÁLIDO si contiene solo espacios', () => {
     control.setValue('      ');
-    expect(control.errors).toEqual({ invalidSpaces: true });
+    expect(NameValidator(control)).toEqual({ invalidSpaces: true });
   });
-
 });
