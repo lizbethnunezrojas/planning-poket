@@ -2,6 +2,8 @@ import { Injectable, signal, computed } from '@angular/core';
 import { Game } from '../models/game.model';
 import { User } from '../models/user.model';
 
+// Fases del juego
+export type GamePhase = 'voting' | 'loading' | 'revealed';
 @Injectable({
   providedIn: 'root',
 })
@@ -9,10 +11,22 @@ export class GameService {
   private readonly STORAGE_KEY = 'planning_poker_game';
   private readonly USER_KEY = 'planning_poker_user';
 
+  // Signals de Estado
   private readonly gameSignal = signal<Game | null>(this.loadGameFromStorage());
   private readonly currentUserSignal = signal<User | null>(this.loadUserFromStorage());
-  private readonly playersSignal = signal<User[]>([]);
-  private readonly availableCardsSignal = signal<(number | string)[]>([
+
+  // Jugadores en la mesa
+  private readonly _players = signal<User[]>([]);
+
+  private readonly _phase = signal<GamePhase>('voting');
+
+  // Signals para los componentes
+  public readonly currentGame = this.gameSignal.asReadonly();
+  public readonly currentUser = this.currentUserSignal.asReadonly();
+  public readonly players = this._players.asReadonly();
+  public readonly phase = this._phase.asReadonly();
+
+  public readonly availableCards = signal<(number | string)[]>([
     0,
     1,
     3,
@@ -25,17 +39,49 @@ export class GameService {
     89,
     '?',
     '☕',
-  ]);
-  public availableCards = this.availableCardsSignal.asReadonly();
-
-  public currentGame = this.gameSignal.asReadonly();
-  public currentUser = this.currentUserSignal.asReadonly();
-  public players = this.playersSignal.asReadonly();
+  ]).asReadonly();
 
   public isGameReady = computed(() => !!this.gameSignal() && !!this.currentUserSignal());
 
+  // Promedio
+  public averageScore = computed(() => {
+    const voters = this._players().filter(
+      (p) => p.viewMode === 'player' && p.selectedCard !== null
+    );
+
+    if (voters.length === 0) return '0.00';
+
+    const sum = voters.reduce((acc, p) => acc + (Number(p.selectedCard) || 0), 0);
+    return (sum / voters.length).toFixed(2);
+  });
+
+  // Resumen de votos para la parte inferior
+  public summaryVotes = computed(() => {
+    const votes = this._players()
+      .filter((p) => p.viewMode === 'player' && p.selectedCard !== null)
+      .map((p) => p.selectedCard as string);
+
+    const counts = votes.reduce((acc, val) => {
+      acc[val] = (acc[val] || 0) + 1;
+      return acc;
+    }, {} as Record<string, number>);
+
+    return Object.entries(counts)
+      .map(([value, count]) => ({ value, count }))
+      .sort((a, b) => Number(a.value) - Number(b.value));
+  });
+
+  //HU5 end
+
   constructor() {
     this.initializePlayers();
+  }
+
+  public revealCards(): void {
+    this._phase.set('loading');
+    setTimeout(() => {
+      this._phase.set('revealed');
+    }, 800);
   }
 
   private initializePlayers(): void {
@@ -67,7 +113,7 @@ export class GameService {
       playersList.push(savedUser);
     }
 
-    this.playersSignal.set(playersList);
+    this._players.set(playersList);
   }
 
   private generateUniqueId(): string {
@@ -84,8 +130,6 @@ export class GameService {
 
     this.currentUserSignal.set(null);
     localStorage.removeItem(this.USER_KEY);
-
-    this.mockPlayers();
   }
 
   public registerUser(userName: string, viewMode: 'player' | 'spectator'): void {
@@ -105,7 +149,7 @@ export class GameService {
     this.currentUserSignal.set(newUser);
     localStorage.setItem(this.USER_KEY, JSON.stringify(newUser));
 
-    this.playersSignal.update((players) => [...players, newUser]);
+    this._players.update((players) => [...players, newUser]);
   }
 
   public selectCard(value: string | number): void {
@@ -124,7 +168,7 @@ export class GameService {
       return updatedUser;
     });
 
-    this.playersSignal.update((players) =>
+    this._players.update((players) =>
       players.map((p) =>
         p.id === this.currentUserSignal()?.id
           ? { ...p, selectedCard: cardValue, hasSelectedCard: true }
@@ -141,28 +185,5 @@ export class GameService {
   private loadUserFromStorage(): User | null {
     const data = localStorage.getItem(this.USER_KEY);
     return data ? JSON.parse(data) : null;
-  }
-
-  private mockPlayers() {
-    this.playersSignal.set([
-      {
-        id: '2',
-        name: 'Alonso Q',
-        role: 'player',
-        viewMode: 'player',
-        selectedCard: null,
-        hasSelectedCard: false,
-        gameId: 'mock',
-      },
-      {
-        id: '3',
-        name: 'Micaela R',
-        role: 'player',
-        viewMode: 'player',
-        selectedCard: null,
-        hasSelectedCard: false,
-        gameId: 'mock',
-      },
-    ]);
   }
 }
