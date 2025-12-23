@@ -3,7 +3,17 @@
 
   <app-game-table [tableRevealed]="false"></app-game-table>
 
-  <app-card-deck></app-card-deck>
+  @if (gameService.phase() === 'revealed') {
+    
+    <app-vote-summary></app-vote-summary>
+
+  } @else {
+    
+    <div [class.loading-fade]="gameService.phase() === 'loading'">
+       <app-card-deck></app-card-deck> 
+    </div>
+
+  }
 
   } @else {
   <div class="loading-container">

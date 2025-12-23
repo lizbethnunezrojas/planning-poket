@@ -1,32 +1,27 @@
 <div class="grid-container">
   <div class="table-center">
     <app-game-table-design>
-      <span class="table-label">
-        <p>Revelar cartas</p>
-        <p>Contando votos</p>
-        <p>Nueva votación</p>
-      </span>
+      <app-game-actions></app-game-actions>
     </app-game-table-design>
   </div>
-  
+
   @for (seatId of SEAT_ORDER; track seatId) {
-    <div [class]="['seat-container', 'seat-' + seatId]">
-      
-      @if (playersInSeats()[seatId]; as player) {
-        <app-card
-          [userName]="player.name"
-          [viewMode]="player.viewMode"
-          [value]="player.selectedCard ?? null"
-          [isRevealed]="tableRevealed()">
-        </app-card>
-      } @else {
-        <div class="empty-seat">
-          <div class="placeholder-card"></div>
-          <span class="placeholder-label">Esperando...</span>
-        </div>
-      }
+  <div [class]="['seat-container', 'seat-' + seatId]">
+    @if (playersInSeats()[seatId]; as player) {
+    <app-card
+      [userName]="player.name"
+      [viewMode]="player.viewMode"
+      [value]="player.selectedCard ?? null"
+      [isRevealed]="gameService.phase() === 'revealed'"
+    >
+    </app-card>
+    } @else {
+    <div class="empty-seat">
+      <div class="placeholder-card"></div>
+      <span class="placeholder-label">Esperando...</span>
     </div>
+    }
+  </div>
   }
 
 </div>
-

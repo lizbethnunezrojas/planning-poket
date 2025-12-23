@@ -1,0 +1,32 @@
+<div class="actions-wrapper">
+  @switch (gameService.phase()) {
+    @case ('voting') {
+      @if (gameService.currentUser()?.role === 'admin') {
+        <button 
+          class="btn-reveal" 
+          [disabled]="!canReveal()"
+          (click)="gameService.revealCards()">
+          Revelar cartas
+        </button>
+      } @else {
+        <p class="status-msg">Votando...</p>
+      }
+    }
+
+@case ('loading') {
+  <div class="loading-container">
+    <div class="dot-loader">
+      <div class="dot"></div>
+      <div class="dot"></div>
+      <div class="dot"></div>
+      <div class="dot"></div>
+    </div>
+    <p class="loading-text">Contando votos</p>
+  </div>
+}
+
+    @case ('revealed') {
+      <button class="btn-reset">Nueva votación</button>
+    }
+  }
+</div>

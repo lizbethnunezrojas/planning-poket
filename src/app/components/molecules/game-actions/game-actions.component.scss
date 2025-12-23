@@ -1,0 +1,86 @@
+.actions-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  
+  .btn-reveal, .btn-reset {
+    background-color: #6429CD; 
+    color: white;
+    border: none;
+    padding: 11px 24px;
+    border-radius: 50px; 
+    font-weight: 600;
+    font-size: 1rem;
+    box-sizing: border-box;
+    cursor: pointer;
+    transition: transform 0.2s, background-color 0.2s;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+
+    &:hover {
+      box-shadow: 0 0 4px #6529cd96;
+    
+    }
+
+    &:active {
+      transform: scale(0.95);
+    }
+  }
+
+  .status-msg {
+    color: rgba(255, 255, 255, 0.7);
+    font-style: italic;
+    font-size: 0.9rem;
+  }
+
+  .loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1.2rem;
+  color: white;
+
+  .dot-loader {
+    display: flex;
+    gap: 0.8rem;
+    align-items: center;
+
+    .dot {
+      width: 26px;
+      height: 26px;
+      border: 4px solid #6429CD; // Color morado de tu diseño
+      border-radius: 50%;
+      background: transparent;
+      box-sizing: border-box;
+      animation: dotPulse 1.4s infinite ease-in-out both;
+
+      // Retrasos para crear el efecto de onda
+      &:nth-child(1) { animation-delay: -0.32s; }
+      &:nth-child(2) { animation-delay: -0.16s; }
+      &:nth-child(3) { animation-delay: -0.08s; }
+    }
+  }
+
+  .loading-text {
+    font-size: 1rem;
+    font-weight: 400;
+    margin: 0;
+    color: white;
+  }
+}
+
+@keyframes dotPulse {
+  0%, 80%, 100% { 
+    transform: scale(0.6);
+    opacity: 0.3;
+    background-color: transparent;
+  } 
+  40% { 
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+}

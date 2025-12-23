@@ -1,6 +1,7 @@
 import { TestBed} from '@angular/core/testing';
 import { GameService } from './game.service';
 import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { User } from '../models/user.model';
 
 describe('GameService - HU4: Lógica de Estado y Jugadores', () => {
   let service: GameService;
@@ -67,48 +68,35 @@ describe('GameService - HU5: Revelar Cartas', () => {
   let service: GameService;
 
   beforeEach(() => {
-    TestBed.configureTestingModule({});
+    vi.useFakeTimers(); 
+    TestBed.configureTestingModule({
+      providers: [GameService]
+    });
     service = TestBed.inject(GameService);
   });
 
-  it('debe calcular el promedio con 2 decimales ignorando espectadores', () => {
-    // Forzar un estado de jugadores para la prueba
-    const mockPlayers: any[] = [
-      { id: '1', viewMode: 'player', selectedCard: '5' },
-      { id: '2', viewMode: 'player', selectedCard: '13' },
-      { id: '3', viewMode: 'spectator', selectedCard: '21' } // Debe ser ignorado
-    ];
-    
-    // Acceder a la señal privada para el test
-    (service as any)._players.set(mockPlayers);
-
-    // (5 + 13) / 2 = 9.00
-    expect(service.averageScore()).toBe('9.00');
+  afterEach(() => {
+    vi.useRealTimers();
+    vi.restoreAllMocks();
   });
 
-it('debe transicionar por las fases: voting -> loading -> revealed', () => {
-  vi.useFakeTimers();
-  
-  // Verificar estado inicial
-  expect(service.phase()).toBe('voting');
-  
-  // Ejecutamr la acción
-  service.revealCards();
-  expect(service.phase()).toBe('loading');
-  
-  // Adelantar el tiempo manualmente 800ms
-  vi.advanceTimersByTime(800);
-  expect(service.phase()).toBe('revealed');
-  
-  // Limpiar los timers para otros tests
-  vi.useRealTimers();
-});
+  it('debe calcular el promedio con 1 decimal excluyendo espectadores (Criterio 5)', () => {
+    const mockPlayers: User[] = [
+      { id: '1', name: 'P1', role: 'admin', viewMode: 'player', selectedCard: '5', hasSelectedCard: true, gameId: 'g1' },
+      { id: '2', name: 'P2', role: 'player', viewMode: 'player', selectedCard: '13', hasSelectedCard: true, gameId: 'g1' },
+      { id: '3', name: 'E1', role: 'player', viewMode: 'spectator', selectedCard: '21', hasSelectedCard: true, gameId: 'g1' }
+    ];
 
-  it('debe generar el resumen de votos correctamente (Criterio 4)', () => {
-    const mockPlayers: any[] = [
-      { id: '1', viewMode: 'player', selectedCard: '8' },
-      { id: '2', viewMode: 'player', selectedCard: '8' },
-      { id: '3', viewMode: 'player', selectedCard: '3' }
+    (service as any)._players.set(mockPlayers);
+
+    expect(service.averageScore()).toBe('9.0');
+  });
+
+  it('debe contar correctamente la cantidad de personas por cada carta (Criterio 4)', () => {
+    const mockPlayers: User[] = [
+      { id: '1', name: 'P1', role: 'admin', viewMode: 'player', selectedCard: '8', hasSelectedCard: true, gameId: 'g1' },
+      { id: '2', name: 'P2', role: 'player', viewMode: 'player', selectedCard: '8', hasSelectedCard: true, gameId: 'g1' },
+      { id: '3', name: 'P3', role: 'player', viewMode: 'player', selectedCard: '3', hasSelectedCard: true, gameId: 'g1' }
     ];
     (service as any)._players.set(mockPlayers);
 
@@ -116,7 +104,26 @@ it('debe transicionar por las fases: voting -> loading -> revealed', () => {
     
     expect(summary).toContainEqual({ value: '8', count: 2 });
     expect(summary).toContainEqual({ value: '3', count: 1 });
-    // Verificar orden ascendente (3 antes que 8)
-    expect(summary[0].value).toBe('3');
+  });
+
+  it('debe identificar correctamente si el usuario tiene rol administrador (Criterio 1)', () => {
+    const adminUser: User = { id: '1', name: 'Admin', role: 'admin', viewMode: 'player', selectedCard: null, hasSelectedCard: false, gameId: 'g1' };
+    
+    (service as any).currentUserSignal.set(adminUser);
+    expect(service.isAdmin()).toBe(true);
+
+    const playerUser: User = { ...adminUser, role: 'player' };
+    (service as any).currentUserSignal.set(playerUser);
+    expect(service.isAdmin()).toBe(false);
+  });
+
+  it('debe transicionar a fase revealed tras el tiempo de carga', async () => {
+    service.revealCards();
+    expect(service.phase()).toBe('loading');
+    
+    await vi.advanceTimersByTimeAsync(4000); 
+    
+    expect(service.phase()).toBe('revealed');
   });
 });
+

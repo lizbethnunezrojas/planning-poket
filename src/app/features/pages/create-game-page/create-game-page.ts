@@ -13,7 +13,8 @@ import { Router } from '@angular/router';
 })
 export class CreateGamePage {
   private readonly router = inject(Router);
-  private readonly gameService = inject(GameService);
+  public readonly gameService = inject(GameService);
+
 
   public handleGameCreation(gameName: string): void {
     this.gameService.createGame(gameName);

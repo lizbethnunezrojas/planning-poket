@@ -43,16 +43,20 @@ export class GameService {
 
   public isGameReady = computed(() => !!this.gameSignal() && !!this.currentUserSignal());
 
+  public isAdmin = computed(() => this.currentUser()?.role === 'admin');
+
   // Promedio
   public averageScore = computed(() => {
     const voters = this._players().filter(
       (p) => p.viewMode === 'player' && p.selectedCard !== null
     );
 
-    if (voters.length === 0) return '0.00';
+    const numericVotes = voters.map((p) => Number(p.selectedCard)).filter((val) => !Number.isNaN(val));
 
-    const sum = voters.reduce((acc, p) => acc + (Number(p.selectedCard) || 0), 0);
-    return (sum / voters.length).toFixed(2);
+    if (numericVotes.length === 0) return '0.0';
+
+    const sum = numericVotes.reduce((acc, val) => acc + val, 0);
+    return (sum / numericVotes.length).toFixed(1);
   });
 
   // Resumen de votos para la parte inferior
@@ -81,7 +85,7 @@ export class GameService {
     this._phase.set('loading');
     setTimeout(() => {
       this._phase.set('revealed');
-    }, 800);
+    }, 2000);
   }
 
   private initializePlayers(): void {
@@ -94,7 +98,7 @@ export class GameService {
         name: 'Alonso Q',
         role: 'player',
         viewMode: 'player',
-        selectedCard: null,
+        selectedCard: '13',
         hasSelectedCard: false,
         gameId: 'mock',
       },
@@ -103,7 +107,7 @@ export class GameService {
         name: 'Micaela R',
         role: 'player',
         viewMode: 'player',
-        selectedCard: null,
+        selectedCard: '21',
         hasSelectedCard: false,
         gameId: 'mock',
       },

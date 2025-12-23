@@ -1,0 +1,21 @@
+<div class="summary-wrapper">
+  <div class="vote-distribution">
+    @for (item of gameService.summaryVotes(); track item.value) {
+      <div class="summary-item">
+        <div class="result-card">
+          {{ item.value }}
+        </div>
+        <span class="count-label">
+          {{ item.count }} {{ item.count === 1 ? 'Voto' : 'Votos' }}
+        </span>
+      </div>
+    }
+  </div>
+
+  <div class="average-display">
+    <p class="average-title">Promedio:</p>
+    <p class="average-number">
+      {{ gameService.averageScore() | number:'1.1-1' }}
+    </p>
+  </div>
+</div>

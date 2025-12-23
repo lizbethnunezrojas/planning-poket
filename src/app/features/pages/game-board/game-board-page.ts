@@ -4,11 +4,13 @@ import { UserService } from '../../../core/services/user.service';
 import { User } from '../../../core/models/user.model';
 import { GameTableComponent } from '../../../components/organisms/game-table/game-table.component';
 import { CardDeckComponent } from '../../../components/organisms/CardDeckComponent/card-deck.component';
+import { VoteSummaryComponent } from '../../../components/molecules/vote-summary/vote-summary.component';
+import { GameService } from '../../../core/services/game.service';
 
 @Component({
   selector: 'app-game-board-page',
   standalone: true,
-  imports: [GameTableComponent, CardDeckComponent],
+  imports: [GameTableComponent, CardDeckComponent, VoteSummaryComponent],
   templateUrl: './game-board-page.html',
   styleUrls: ['./game-board-page.scss'],
 })
@@ -16,6 +18,9 @@ export class GameBoardPage implements OnInit {
   private readonly userService = inject(UserService);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
+
+    public readonly gameService = inject(GameService);
+  
   
   currentUser = signal<User | null>(null);
   allPlayers = signal<User[]>([]);
@@ -31,16 +36,5 @@ export class GameBoardPage implements OnInit {
     }
 
     this.currentUser.set(user);
-
-    const mockPlayers: User[] = [
-      { id: '1', name: 'MMMMMMMMM', viewMode: 'player', gameId: gameIdFromUrl, role: 'player', hasSelectedCard: true, selectedCard: '8' },
-      { id: '2', name: 'Micaelaaaaaaaaaaaa 2', viewMode: 'player', gameId: gameIdFromUrl, role: 'player', hasSelectedCard: true, selectedCard: '8' },
-      { id: '3', name: 'Micaela 3', viewMode: 'player', gameId: gameIdFromUrl, role: 'player', hasSelectedCard: true, selectedCard: '' },
-      { id: '4', name: 'Micaela 4', viewMode: 'player', gameId: gameIdFromUrl, role: 'player', hasSelectedCard: true, selectedCard: '8' },
-      { id: '5', name: 'Micaela 5', viewMode: 'player', gameId: gameIdFromUrl, role: 'player', hasSelectedCard: true, selectedCard: '8' },
-      user 
-    ];
-
-    this.allPlayers.set(mockPlayers);
   }
 }

@@ -4,17 +4,18 @@ import { CardComponent } from '../../atoms/card/card.component';
 
 import { User } from '../../../core/models/user.model';
 import { GameService } from '../../../core/services/game.service';
+import { GameActionsComponent } from '../../molecules/game-actions/game-actions.component';
 
 @Component({
   selector: 'app-game-table',
   standalone: true,
-  imports: [GameTableDesignComponent, CardComponent],
+  imports: [GameTableDesignComponent, CardComponent, GameActionsComponent],
   templateUrl: './game-table.component.html',
   styleUrls: ['./game-table.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class GameTableComponent {
-  private readonly gameService = inject(GameService);
+  public readonly gameService = inject(GameService);
 
   tableRevealed = input<boolean>(false);
 
