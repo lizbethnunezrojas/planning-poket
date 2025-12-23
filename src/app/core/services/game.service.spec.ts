@@ -63,7 +63,7 @@ describe('GameService - HU4: Lógica de Estado y Jugadores', () => {
     });
   });
 });
-
+// ----------------------------------------------------------------------------
 describe('GameService - HU5: Revelar Cartas', () => {
   let service: GameService;
 
@@ -121,9 +121,59 @@ describe('GameService - HU5: Revelar Cartas', () => {
     service.revealCards();
     expect(service.phase()).toBe('loading');
     
-    await vi.advanceTimersByTimeAsync(4000); 
+    await vi.advanceTimersByTimeAsync(2000); 
     
     expect(service.phase()).toBe('revealed');
   });
 });
 
+// ----------------------------------------------------------------------------
+
+describe('GameService - HU6: Reiniciar Partida', () => {
+  let service: GameService;
+
+  beforeEach(() => {
+    vi.useFakeTimers();
+    TestBed.configureTestingModule({
+      providers: [GameService]
+    });
+    service = TestBed.inject(GameService);
+    
+    vi.stubGlobal('localStorage', {
+      setItem: vi.fn(),
+      getItem: vi.fn(),
+    });
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  it('debe resetear la fase y limpiar votos si el usuario es admin (Criterios 1 y 2)', () => {
+    const adminUser: User = { id: '1', name: 'Admin', role: 'admin', viewMode: 'player', selectedCard: '8', hasSelectedCard: true, gameId: 'g1' };
+    const playerUser: User = { id: '2', name: 'Luis', role: 'player', viewMode: 'player', selectedCard: '5', hasSelectedCard: true, gameId: 'g1' };
+    
+    (service as any).currentUserSignal.set(adminUser);
+    (service as any)._players.set([adminUser, playerUser]);
+    (service as any)._phase.set('revealed');
+
+    service.resetGame();
+
+    expect(service.phase()).toBe('voting');
+    service.players().forEach(player => {
+      expect(player.selectedCard).toBeNull();
+      expect(player.hasSelectedCard).toBe(false);
+    });
+  });
+
+  it('NO debe resetear la partida si el usuario no es admin (Criterio 1)', () => {
+    const playerUser: User = { id: '2', name: 'Luis', role: 'player', viewMode: 'player', selectedCard: '5', hasSelectedCard: true, gameId: 'g1' };
+    
+    (service as any).currentUserSignal.set(playerUser);
+    (service as any)._phase.set('revealed');
+
+    service.resetGame();
+
+    expect(service.phase()).toBe('revealed');
+  });
+});

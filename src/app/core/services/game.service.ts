@@ -51,7 +51,9 @@ export class GameService {
       (p) => p.viewMode === 'player' && p.selectedCard !== null
     );
 
-    const numericVotes = voters.map((p) => Number(p.selectedCard)).filter((val) => !Number.isNaN(val));
+    const numericVotes = voters
+      .map((p) => Number(p.selectedCard))
+      .filter((val) => !Number.isNaN(val));
 
     if (numericVotes.length === 0) return '0.0';
 
@@ -189,5 +191,27 @@ export class GameService {
   private loadUserFromStorage(): User | null {
     const data = localStorage.getItem(this.USER_KEY);
     return data ? JSON.parse(data) : null;
+  }
+
+  //HU7
+  public resetGame(): void {
+    if (!this.isAdmin()) return;
+
+    this._phase.set('voting');
+
+    this._players.update((players) =>
+      players.map((player) => ({
+        ...player,
+        selectedCard: null,
+        hasSelectedCard: false,
+      }))
+    );
+
+    this.currentUserSignal.update((user) => {
+      if (!user) return null;
+      const updatedUser = { ...user, selectedCard: null, hasSelectedCard: false };
+      localStorage.setItem(this.USER_KEY, JSON.stringify(updatedUser));
+      return updatedUser;
+    });
   }
 }
