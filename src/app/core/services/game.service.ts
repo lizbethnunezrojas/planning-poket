@@ -1,6 +1,6 @@
 import { Injectable, signal, computed } from '@angular/core';
 import { Game } from '../models/game.model';
-import { User } from '../models/user.model';
+import { User, UserRole, ViewMode } from '../models/user.model';
 
 // Fases del juego
 export type GamePhase = 'voting' | 'loading' | 'revealed';
@@ -77,8 +77,6 @@ export class GameService {
       .sort((a, b) => Number(a.value) - Number(b.value));
   });
 
-  //HU5 end
-
   constructor() {
     this.initializePlayers();
   }
@@ -138,24 +136,91 @@ export class GameService {
     localStorage.removeItem(this.USER_KEY);
   }
 
-  public registerUser(userName: string, viewMode: 'player' | 'spectator'): void {
-    const currentGame = this.gameSignal();
-    if (!currentGame) return;
+  public registerUser(
+    userName: string,
+    viewMode: 'player' | 'spectator',
+    inviteGameId?: string
+  ): void {
+    const isGuest = !this.gameSignal() && !!inviteGameId;
+    const gameId = (inviteGameId || this.gameSignal()?.id)?.trim();
+
+    if (!gameId) return;
+
+    let userRole: UserRole = 'player';
+    if (!isGuest && !this.currentUserSignal()) {
+      userRole = 'admin';
+    }
 
     const newUser: User = {
       id: this.generateUniqueId(),
       name: userName,
-      role: this.currentUserSignal() ? 'player' : 'admin',
+      role: userRole,
       viewMode: viewMode,
       selectedCard: null,
       hasSelectedCard: false,
-      gameId: currentGame.id,
+      gameId: gameId,
     };
 
     this.currentUserSignal.set(newUser);
     localStorage.setItem(this.USER_KEY, JSON.stringify(newUser));
 
-    this._players.update((players) => [...players, newUser]);
+    if (isGuest) {
+      const guestGame: Game = { id: gameId, name: 'Sprint 32' };
+      this.gameSignal.set(guestGame);
+      localStorage.setItem(this.STORAGE_KEY, JSON.stringify(guestGame));
+
+      const simulatedAdmin: User = {
+        id: 'admin-123',
+        name: 'Admin (Creador)',
+        role: 'admin' as UserRole,
+        viewMode: 'player' as ViewMode,
+        selectedCard: null,
+        hasSelectedCard: false,
+        gameId,
+      };
+
+      this._players.set([
+        simulatedAdmin,
+        {
+          id: '2',
+          name: 'Alonso Q',
+          role: 'player' as UserRole,
+          viewMode: 'player' as ViewMode,
+          selectedCard: '13',
+          hasSelectedCard: true,
+          gameId,
+        },
+        newUser,
+      ]);
+    } else {
+      this._players.update((players) => [...players, newUser]);
+    }
+  }
+
+  private setupInvitationTable(guestUser: User, gameId: string): void {
+    const simulatedAdmin: User = {
+      id: 'admin-123',
+      name: 'Admin (Creador)',
+      role: 'admin' as UserRole,
+      viewMode: 'player' as ViewMode,
+      selectedCard: null,
+      hasSelectedCard: false,
+      gameId,
+    };
+
+    this._players.set([
+      simulatedAdmin,
+      {
+        id: '2',
+        name: 'Alonso Q',
+        role: 'player' as UserRole,
+        viewMode: 'player' as ViewMode,
+        selectedCard: '13',
+        hasSelectedCard: true,
+        gameId,
+      },
+      guestUser,
+    ]);
   }
 
   public selectCard(value: string | number): void {
@@ -193,7 +258,6 @@ export class GameService {
     return data ? JSON.parse(data) : null;
   }
 
-  //HU7
   public resetGame(): void {
     if (!this.isAdmin()) return;
 

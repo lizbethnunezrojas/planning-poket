@@ -1,23 +1,24 @@
-<div class="game-layout">
-  @if (currentUser(); as user) {
+@if (currentUser(); as user) {
+<div class="game-board-container">
+  <section class="header-space"></section>
+  <section class="main-content">
+    <app-game-table [tableRevealed]="gameService.phase() === 'revealed'"> </app-game-table>
+  </section>
 
-  <app-game-table [tableRevealed]="false"></app-game-table>
-
-  @if (gameService.phase() === 'revealed') {
-    
-    <app-vote-summary></app-vote-summary>
-
-  } @else {
-    
-    <div [class.loading-fade]="gameService.phase() === 'loading'">
-       <app-card-deck></app-card-deck> 
+  <section class="bottom-actions">
+    @if (gameService.phase() === 'revealed') {
+    <div class="deck-container">
+      <app-vote-summary></app-vote-summary>
     </div>
-
-  }
-
-  } @else {
-  <div class="loading-container">
-    <p>Cargando mesa de juego...</p>
-  </div>
-  }
+    } @else {
+    <div [class.loading-fade]="gameService.phase() === 'loading'" class="deck-container">
+      <app-card-deck></app-card-deck>
+    </div>
+    }
+  </section>
 </div>
+} @else {
+<div class="loading-full-view">
+  <p>Cargando mesa de juego...</p>
+</div>
+}

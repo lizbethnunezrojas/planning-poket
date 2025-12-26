@@ -1,0 +1,38 @@
+<button class="btn-invite-trigger" (click)="openModal()">Invitar jugadores</button>
+
+@if (isModalOpen()) {
+<div class="modal-wrapper">
+  <button
+    type="button"
+    class="modal-backdrop"
+    (click)="closeModal()"
+    (window:keydown.escape)="closeModal()"
+    aria-label="Cerrar invitación"
+  ></button>
+
+  <dialog open class="modal-container">
+    <div class="modal-header">
+      <h2 class="modal-title">Invitar jugadores</h2>
+      <button type="button" class="btn-close" (click)="closeModal()" aria-label="Cerrar">
+        &times;
+      </button>
+    </div>
+
+    <div class="modal-body">
+      <div class="input-wrapper">
+        <input
+          type="text"
+          [value]="inviteUrl()"
+          readonly
+          class="invite-input"
+          aria-label="Enlace de la partida"
+        />
+      </div>
+
+      <button type="button" class="btn-copy" [class.copied]="copied()" (click)="copyLink()">
+        @if (copied()) { ¡Copiado! } @else { Copiar link }
+      </button>
+    </div>
+  </dialog>
+</div>
+}

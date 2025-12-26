@@ -1,0 +1,25 @@
+<header class="game-header">
+  <div class="header-left">
+    <img src="logo.png" alt="Logo" class="logo" />
+    @if (!gameService.currentGame()) {
+    <p class="create-game">Crear partida</p>
+    }
+  </div>
+
+  <div class="header-center">
+    <h1 class="game-title">{{ gameService.currentGame()?.name | capitalizeWords }}</h1>
+  </div>
+
+  @if(gameService.currentUser()){
+
+  <div class="header-right">
+    <div class="user-avatar">
+      {{ gameService.currentUser()?.name?.slice(0, 2) }}
+    </div>
+
+    @if (gameService.isAdmin()) {
+    <app-invite-players></app-invite-players>
+    }
+  </div>
+  }
+</header>

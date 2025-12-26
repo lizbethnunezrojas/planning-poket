@@ -1,6 +1,13 @@
-<main class="join-game-page">
-  <section class="join-game-page__content">
-    <app-join-game-form (userCreated)="handleJoin($event)">
-    </app-join-game-form>    
-  </section>
-</main>
+<div class="background-layout">
+  <div class="table-wrapper">
+    <app-game-table-design></app-game-table-design>
+  </div>
+
+  <div class="deck-wrapper">
+    <app-card-deck [isPreview]="true"></app-card-deck>
+  </div>
+</div>
+
+<div class="glass-overlay">
+  <app-join-game-form (userCreated)="handleJoin($event)"></app-join-game-form>
+</div>

@@ -1,9 +1,11 @@
 import { Component, computed, HostBinding, input } from '@angular/core';
 import { ViewMode } from '../../../core/models/user.model';
+import { CapitalizeWordsPipe } from '../../../shared/capitalize-words.pipe';
 
 @Component({
   selector: 'app-card',
   standalone: true,
+  imports: [CapitalizeWordsPipe],
   templateUrl: './card.component.html',
   styleUrl: './card.component.scss',
 })
@@ -18,17 +20,6 @@ export class CardComponent {
   isRevealed = input<boolean>(false);
 
   isSelected = input<boolean>(false);
-
-  formattedName = computed(() => {
-    const name = this.userName().trim();
-    if (!name) return '';
-
-    return name
-      .toLowerCase()
-      .split(' ')
-      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-      .join(' ');
-  });
 
   initials = computed(() =>
     this.userName()

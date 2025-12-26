@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject, computed } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, computed, input } from '@angular/core';
 import { GameService } from '../../../core/services/game.service';
 import { CardComponent } from '../../atoms/card/card.component';
 
@@ -15,10 +15,13 @@ export class CardDeckComponent {
 
   public readonly availableCards = this.gameService.availableCards;
   public readonly currentUser = this.gameService.currentUser;
+  public isPreview = input<boolean>(false);
 
   public readonly isPlayer = computed(() => this.currentUser()?.viewMode === 'player');
 
   public selectCard(value: string | number): void {
     this.gameService.selectCard(value);
   }
+
+  public shouldDisplay = computed(() => this.isPlayer() || this.isPreview());
 }

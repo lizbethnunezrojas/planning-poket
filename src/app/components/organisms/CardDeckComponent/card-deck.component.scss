@@ -1,11 +1,9 @@
 .card-deck {
-  padding-top: 53px;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 23px;
   width: 100%;
-
   &__title {
     color: #ffffff;
     font-size: 1.3rem;
@@ -31,7 +29,7 @@
 
 :host ::ng-deep {
   .card-box {
-    width: auto !important; 
+    width: auto !important;
     min-height: auto !important;
   }
 
@@ -40,15 +38,14 @@
     height: 80px !important;
     font-weight: 600;
     font-family: Poppins, serif;
-    
+
     &.card--revealed {
       color: white;
-      
     }
-    
+
     &.card--selected {
-      border: #E4A4FF 1px solid !important;
-      background-color: #E4A4FF !important;
+      border: #e4a4ff 1px solid !important;
+      background-color: #e4a4ff !important;
       box-shadow: 0 0 4px #e2aafae3, inset 0 0 2px #e4a4ffd1;
       transform: translateY(-6px);
       font-size: 16px;
@@ -57,7 +54,6 @@
       justify-content: center;
       align-items: center;
       transition: all 0.4s;
-      
     }
   }
 }

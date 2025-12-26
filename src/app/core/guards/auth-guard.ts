@@ -6,11 +6,14 @@ export const authGuard: CanActivateFn = (route, state) => {
   const gameService = inject(GameService);
   const router = inject(Router);
 
-  const gameIdFromUrl = route.params['id'];
-  const currentGame = gameService.currentGame();
+  const gameIdFromUrl = route.paramMap.get('id')?.trim();
   const currentUser = gameService.currentUser();
 
-  if (currentGame?.id === gameIdFromUrl && currentUser) {
+  const userGameId = currentUser?.gameId?.trim();
+
+  console.log(`Comparando: [${userGameId}] === [${gameIdFromUrl}]`);
+
+  if (currentUser && userGameId === gameIdFromUrl) {
     return true;
   }
 

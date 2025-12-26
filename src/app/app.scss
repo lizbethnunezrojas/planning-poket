@@ -1,0 +1,23 @@
+:host {
+  display: grid;
+  grid-template-rows: auto 1fr;
+  height: 100vh;
+  overflow: hidden;
+}
+
+app-header {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  z-index: 10;
+}
+
+.app-main {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+}
