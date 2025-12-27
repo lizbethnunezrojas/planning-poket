@@ -1,10 +1,12 @@
 import { AbstractControl, ValidationErrors, ValidatorFn } from '@angular/forms';
 
 export const NameValidator: ValidatorFn = (control: AbstractControl): ValidationErrors | null => {
-  const name = control.value as string;
+  const name = (control.value as string) || '';
 
-  if (!name) {
-    return null;
+  if (!name) return null;
+
+  if (name.length < 5 || name.length > 20) {
+    return { invalidLength: { current: name.length, required: '5-20' } };
   }
 
   if (name.trim().length !== name.length) {
@@ -16,11 +18,15 @@ export const NameValidator: ValidatorFn = (control: AbstractControl): Validation
     return { invalidSpecialChars: true };
   }
 
+  const onlyNumbersRegex = /^\d+$/;
+  if (onlyNumbersRegex.test(name)) {
+    return { onlyNumbers: true };
+  }
+  
   const numbersCount = (name.match(/\d/g) || []).length;
   if (numbersCount > 3) {
     return { tooManyNumbers: true };
   }
-
   return null;
 };
 
@@ -33,20 +39,12 @@ export function getNameErrorMessage(control: AbstractControl | null): string | n
     return 'Este campo es obligatorio.';
   }
 
-  if (control.hasError('invalidSpaces')) {
-    return 'El nombre no puede tener espacios al inicio ni al final.';
-  }
-  
-  if (control.hasError('minlength')) {
-    return `El nombre debe tener al menos ${
-      control.getError('minlength')?.requiredLength
-    } caracteres.`;
+  if (control.hasError('invalidLength')) {
+    return 'El nombre debe tener entre 5 y 20 caracteres.';
   }
 
-  if (control.hasError('maxlength')) {
-    return `El nombre no puede exceder los ${
-      control.getError('maxlength')?.requiredLength
-    } caracteres.`;
+  if (control.hasError('invalidSpaces')) {
+    return 'El nombre no puede tener espacios al inicio ni al final.';
   }
 
   if (control.hasError('invalidSpecialChars')) {
@@ -55,6 +53,10 @@ export function getNameErrorMessage(control: AbstractControl | null): string | n
 
   if (control.hasError('tooManyNumbers')) {
     return 'El nombre puede tener máximo 3 números.';
+  }
+
+  if (control.hasError('onlyNumbers')) {
+    return 'El nombre no puede contener solo números.';
   }
 
   return null;

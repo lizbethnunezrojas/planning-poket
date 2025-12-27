@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { User, ViewMode} from '../models/user.model';
+import { User, UserRole, ViewMode} from '../models/user.model';
 
 @Injectable({
   providedIn: 'root',
@@ -7,13 +7,13 @@ import { User, ViewMode} from '../models/user.model';
 export class UserService {
   private readonly STORAGE_KEY = 'planning_poker_user';
 
-  public saveUser(data: { name: string; viewMode: ViewMode; gameId: string }): void {
+  public saveUser(data: { name: string; viewMode: ViewMode; gameId: string; role: UserRole }): void {
     const newUser: User = {
       id: crypto.randomUUID(),
       name: data.name,
       viewMode: data.viewMode,
       gameId: data.gameId,
-      role: 'admin',
+      role: data.role,
       hasSelectedCard: false, 
       selectedCard: null
     };

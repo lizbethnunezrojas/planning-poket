@@ -17,9 +17,7 @@
       {{ gameService.currentUser()?.name?.slice(0, 2) }}
     </div>
 
-    @if (gameService.isAdmin()) {
     <app-invite-players></app-invite-players>
-    }
   </div>
   }
 </header>

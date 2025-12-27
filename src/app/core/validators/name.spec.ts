@@ -1,48 +1,44 @@
 import { FormControl } from '@angular/forms';
 import { NameValidator } from './name.validator';
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect } from 'vitest';
 
 describe('NameValidator - Pruebas de Lógica Pura', () => {
   let control: FormControl;
 
-  beforeEach(() => {
-    control = new FormControl('');
+  it('debería ser válido con un nombre que cumple todas las reglas (ej. Elizabeth)', () => {
+    const control = new FormControl('Elizabeth');
+    expect(NameValidator(control)).toBeNull();
   });
 
-  // ESCENARIOS DE ÉXITO 
-
-  it('debería ser VÁLIDO si cumple todas las reglas (ej: MiPartida001)', () => {
-    control.setValue('MiPartida001');
+  it('debería fallar si el nombre tiene menos de 5 caracteres (Criterio 2)', () => {
+    const control = new FormControl('Alex');
     const result = NameValidator(control);
-    expect(result).toBeNull(); 
+    expect(result).toHaveProperty('invalidLength');
   });
-  
-  it('debería ser VÁLIDO con el máximo permitido de 3 números (ej: Partida123)', () => {
-    control.setValue('Partida123');
+
+  it('debería fallar si el nombre tiene más de 20 caracteres (Criterio 2)', () => {
+    const control = new FormControl('EsteNombreEsDemasiadoLargoParaElSistema');
     const result = NameValidator(control);
-    expect(result).toBeNull();
+    expect(result).toHaveProperty('invalidLength');
   });
 
-  // ESCENARIOS DE ERROR 
-
-  it('debería ser INVÁLIDO si contiene caracteres especiales (ej: _ o /)', () => {
-    control.setValue('Partida_Test');
-    expect(NameValidator(control)).toEqual({ invalidSpecialChars: true });
-
-    control.setValue('Partida/Test');
+  it('debería fallar si contiene caracteres especiales como _ o * (Criterio 2)', () => {
+    const control = new FormControl('Alexa_123');
     expect(NameValidator(control)).toEqual({ invalidSpecialChars: true });
   });
 
-  it('debería ser INVÁLIDO si excede el límite de 3 números (ej: Partida1234)', () => {
-    control.setValue('Partida1234');
+  it('debería fallar si tiene más de 3 números (Criterio 2)', () => {
+    const control = new FormControl('Player1234');
     expect(NameValidator(control)).toEqual({ tooManyNumbers: true });
   });
 
-  it('debería ser INVÁLIDO si contiene espacios al inicio o solo espacios', () => {
-    control.setValue(' Partida12');
-    expect(NameValidator(control)).toEqual({ invalidSpaces: true });
+  it('debería fallar si el nombre contiene solo números (Criterio 2)', () => {
+    const control = new FormControl('12345');
+    expect(NameValidator(control)).toEqual({ onlyNumbers: true });
+  });
 
-    control.setValue('      ');
+  it('debería fallar si hay espacios al inicio o al final', () => {
+    const control = new FormControl(' Elizabeth ');
     expect(NameValidator(control)).toEqual({ invalidSpaces: true });
   });
 });
