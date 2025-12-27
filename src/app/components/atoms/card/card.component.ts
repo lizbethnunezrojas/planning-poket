@@ -21,13 +21,7 @@ export class CardComponent {
 
   isSelected = input<boolean>(false);
 
-  initials = computed(() =>
-    this.userName()
-      .split('')
-      .map((n) => n[0])
-      .join('')
-      .substring(0, 2)
-      .toUpperCase()
+  initials = computed(() => this.userName().substring(0, 2).toUpperCase()
   );
 
   cardClass = computed(() => {

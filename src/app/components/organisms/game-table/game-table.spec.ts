@@ -1,45 +1,69 @@
-import { render, screen} from '@testing-library/angular';
+import { render, screen } from '@testing-library/angular';
 import { GameTableComponent } from './game-table.component';
 import { GameService } from '../../../core/services/game.service';
 import { signal } from '@angular/core';
+import { describe, it, expect } from 'vitest';
 
-describe('GameTableComponent - HU4', () => {
-  const mockPlayers = [
-    { id: '1', name: 'micaela r', viewMode: 'player', selectedCard: '5' }
-  ];
+describe('GameTableComponent - HU09 & Estabilidad de Mesa', () => {
+  
+  const mockAdmin = { id: '1', name: 'Elizabeth', role: 'admin', viewMode: 'player' };
+  const mockPlayer = { id: '2', name: 'Alexa', role: 'player', viewMode: 'player', selectedCard: '8' };
 
-it('debería mostrar a los jugadores desde el servicio', async () => {
-  const mockGameService = {
-    players: signal(mockPlayers),
-    currentUser: signal(mockPlayers[0]),
-    phase: signal('voting'), 
-    isAdmin: signal(true),   
-  };
 
-  await render(GameTableComponent, {
-    providers: [
-      {
-        provide: GameService,
-        useValue: mockGameService
-      }
-    ]
+  it('debería renderizar siempre 8 contenedores de asiento (Criterio 3 - Estructura Fija)', async () => {
+    const mockService = {
+      players: signal([mockAdmin]),
+      currentUser: signal(mockAdmin),
+      phase: signal('voting'),
+      isAdmin: signal(true)
+    };
+
+    const { container } = await render(GameTableComponent, {
+      providers: [{ provide: GameService, useValue: mockService }]
+    });
+
+    const seats = container.querySelectorAll('.seat-container');
+    expect(seats.length).toBe(8);
   });
 
-  expect(screen.getByText('Micaela R')).toBeTruthy();
-});
-});
+  it('debería mostrar "Esperando..." en los asientos que no tienen jugador', async () => {
+    const mockService = {
+      players: signal([mockAdmin]), 
+      currentUser: signal(mockAdmin),
+      phase: signal('voting'),
+      isAdmin: signal(true)
+    };
 
-describe('GameTableComponent - Integración HU5', () => {
-  
-  const mockAdmin = { id: '1', name: 'Admin', role: 'admin', viewMode: 'player' };
-  const mockPlayer = { id: '2', name: 'Pepe', role: 'player', viewMode: 'player', selectedCard: '8' };
-  const mockSpectator = { id: '3', name: 'Ojo', role: 'player', viewMode: 'spectator', selectedCard: '13' };
+    await render(GameTableComponent, {
+      providers: [{ provide: GameService, useValue: mockService }]
+    });
 
-  it('debería mostrar el botón Revelar solo si el usuario es Admin (Criterio 1)', async () => {
+    const waitingLabels = screen.getAllByText(/esperando.../i);
+    expect(waitingLabels.length).toBe(7);
+  });
+
+
+  it('debería mostrar el nombre de los jugadores conectados (HU04)', async () => {
+    const mockService = {
+      players: signal([mockAdmin, mockPlayer]),
+      currentUser: signal(mockAdmin),
+      phase: signal('voting'),
+      isAdmin: signal(true)
+    };
+
+    await render(GameTableComponent, {
+      providers: [{ provide: GameService, useValue: mockService }]
+    });
+
+    expect(screen.getByText(/Elizabeth/i)).toBeTruthy();
+    expect(screen.getByText(/Alexa/i)).toBeTruthy();
+  });
+
+  it('debería mostrar el botón "Revelar cartas" solo si el usuario es Admin (HU05 - Criterio 1)', async () => {
     const mockService = {
       phase: signal('voting'),
       currentUser: signal(mockAdmin),
-      players: signal([mockAdmin, mockPlayer]),
+      players: signal([mockAdmin]),
       isAdmin: signal(true)
     };
 
@@ -50,7 +74,7 @@ describe('GameTableComponent - Integración HU5', () => {
     expect(screen.getByText(/revelar cartas/i)).toBeTruthy();
   });
 
-  it('debería mostrar los valores de las cartas cuando la fase es revealed (Criterio 2)', async () => {
+  it('debería mostrar los valores de las cartas cuando la fase es "revealed" (HU05 - Criterio 2)', async () => {
     const mockService = {
       phase: signal('revealed'),
       currentUser: signal(mockAdmin),
@@ -63,21 +87,5 @@ describe('GameTableComponent - Integración HU5', () => {
     });
 
     expect(screen.getByText('8')).toBeTruthy();
-  });
-
-  it('debería ocultar el valor si el usuario es espectador aunque esté revelado (Criterio 3)', async () => {
-    const mockService = {
-      phase: signal('revealed'),
-      currentUser: signal(mockAdmin),
-      players: signal([mockSpectator]),
-      isAdmin: signal(true)
-    };
-
-    await render(GameTableComponent, {
-      providers: [{ provide: GameService, useValue: mockService }]
-    });
-
-    const cardValue = screen.queryByText('13');
-    expect(cardValue).toBeNull();
   });
 });

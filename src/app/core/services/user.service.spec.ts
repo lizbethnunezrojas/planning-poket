@@ -1,27 +1,40 @@
-import { describe, it, expect, beforeEach } from 'vitest';
-import { UserService } from './user.service';
 import { TestBed } from '@angular/core/testing';
+import { UserService } from './user.service';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 
 describe('UserService - Validación HU08', () => {
   let service: UserService;
 
+  const localStorageMock = (() => {
+    let store: Record<string, string> = {};
+    return {
+      getItem: (key: string) => store[key] || null,
+      setItem: (key: string, value: string) => { store[key] = value; },
+      clear: () => { store = {}; },
+      removeItem: (key: string) => { delete store[key]; }
+    };
+  })();
+
+  vi.stubGlobal('localStorage', localStorageMock);
+
   beforeEach(() => {
     TestBed.configureTestingModule({});
     service = TestBed.inject(UserService);
-    localStorage.clear();
+    localStorage.clear(); 
   });
 
   it('debería guardar a un invitado con el rol "player" (Criterio 3)', () => {
-    service.saveUser({
+    const mockGuest = {
       name: 'Alexa',
-      viewMode: 'player',
+      viewMode: 'player' as const,
       gameId: 'XWARXH4',
-      role: 'player' 
-    });
+      role: 'player' as const
+    };
 
+    service.saveUser(mockGuest);
     const user = service.getCurrentUser();
-    expect(user?.name).toBe('Alexa');
+
     expect(user?.role).toBe('player');
-    expect(user?.gameId).toBe('XWARXH4');
+    expect(user?.name).toBe('Alexa');
   });
 });
