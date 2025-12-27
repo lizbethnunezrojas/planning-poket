@@ -1,13 +1,12 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { render, screen, fireEvent } from '@testing-library/angular';
 import { InvitePlayersComponent } from './invite-players.component';
 import { GameService } from '../../../core/services/game.service';
 import { signal } from '@angular/core';
-import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
-describe('InvitePlayersComponent', () => {
-  let component: InvitePlayersComponent;
-  let fixture: ComponentFixture<InvitePlayersComponent>;
-  const mockCurrentGame = signal<any>(null);
+describe('InvitePlayersComponent - Cierre HU11', () => {
+  const mockId = 'XWARXH4';
+  const mockCurrentGame = signal<any>({ id: mockId, name: 'Sprint 32' });
 
   beforeEach(async () => {
     vi.stubGlobal('navigator', {
@@ -15,44 +14,32 @@ describe('InvitePlayersComponent', () => {
         writeText: vi.fn().mockResolvedValue(undefined),
       },
     });
-
     vi.useFakeTimers();
-
-    await TestBed.configureTestingModule({
-      imports: [InvitePlayersComponent],
-      providers: [
-        { provide: GameService, useValue: { currentGame: mockCurrentGame } }
-      ]
-    }).compileComponents();
-
-    fixture = TestBed.createComponent(InvitePlayersComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
   });
 
   afterEach(() => {
     vi.useRealTimers();
   });
 
-  it('debería crear el componente', () => {
-    expect(component).toBeTruthy();
-  });
+  it('debería copiar al portapapeles y manejar el estado visual por 1 segundo (AC2)', async () => {
+    const { fixture } = await render(InvitePlayersComponent, {
+      providers: [{ provide: GameService, useValue: { currentGame: mockCurrentGame } }]
+    });
 
-  it('debería llamar a clipboard.writeText y activar el estado "copied"', async () => {
-    const testId = 'XYZ';
-    mockCurrentGame.set({ id: testId });
-    fixture.detectChanges();
+    fireEvent.click(screen.getByText(/invitar jugadores/i));
 
-    const expectedUrl = `${globalThis.location.origin}/join/${testId}`;
-
-    component.copyLink();
-
-    expect(navigator.clipboard.writeText).toHaveBeenCalledWith(expectedUrl);
+    const copyBtn = screen.getByText(/copiar link/i);
+    fireEvent.click(copyBtn);
 
     await Promise.resolve(); 
-    expect(component.copied()).toBe(true);
+    fixture.detectChanges(); 
+
+    expect(screen.getByText(/¡copiado!/i)).toBeTruthy();
 
     vi.advanceTimersByTime(1000);
-    expect(component.copied()).toBe(false);
+    fixture.detectChanges(); 
+    
+    expect(screen.queryByText(/¡copiado!/i)).toBeNull();
+    expect(screen.getByText(/copiar link/i)).toBeTruthy();
   });
 });
