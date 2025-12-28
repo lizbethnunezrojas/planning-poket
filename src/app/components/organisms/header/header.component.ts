@@ -2,6 +2,8 @@ import { Component, inject, ChangeDetectionStrategy, computed } from '@angular/c
 import { GameService } from '../../../core/services/game.service';
 import { InvitePlayersComponent } from '../../molecules/invite-players/invite-players.component';
 import { CapitalizeWordsPipe } from '../../../shared/capitalize-words.pipe';
+import { Router } from '@angular/router';
+
 
 @Component({
   selector: 'app-header',
@@ -13,6 +15,7 @@ import { CapitalizeWordsPipe } from '../../../shared/capitalize-words.pipe';
 })
 export class HeaderComponent {
   public readonly gameService = inject(GameService);
+  private readonly router = inject(Router);
 
   public isCreatingGame = computed(() => !this.gameService.currentGame());
 
@@ -23,4 +26,11 @@ export class HeaderComponent {
   public isInGame = computed(
     () => !!this.gameService.currentGame() && !!this.gameService.currentUser()
   );
+
+  public navigateToEditProfile(): void {
+    const gameId = this.gameService.currentGame()?.id;
+    if (gameId) {
+    this.router.navigate(['/join', gameId]);
+  }
+  }
 }

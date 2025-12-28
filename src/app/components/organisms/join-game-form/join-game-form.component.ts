@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, EventEmitter, Output, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, OnInit, Output, inject } from '@angular/core';
 import {
   FormBuilder,
   FormGroup,
@@ -12,6 +12,7 @@ import { ButtonComponent } from '../../atoms/button/button.component';
 import { NameValidator, getNameErrorMessage  } from '../../../core/validators/name.validator';
 
 import { ViewMode} from '../../../core/models/user.model';
+import { GameService } from '../../../core/services/game.service';
 
 @Component({
   selector: 'app-join-game-form',
@@ -26,8 +27,9 @@ import { ViewMode} from '../../../core/models/user.model';
   styleUrls: ['./join-game-form.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class JoinGameFormComponent {
+export class JoinGameFormComponent implements OnInit{
   private readonly fb = inject(FormBuilder);
+  private readonly gameService = inject(GameService);
 
   @Output() userCreated = new EventEmitter<{ name: string; viewMode: ViewMode }>();
 
@@ -45,6 +47,19 @@ export class JoinGameFormComponent {
     })
   });
 
+  ngOnInit(): void {
+    const currentUser = this.gameService.currentUser();
+    
+    if (currentUser) {
+      this.joinForm.patchValue({
+        name: currentUser.name,
+        viewMode: currentUser.viewMode
+      });
+
+      this.joinForm.get('name')?.disable();
+    }
+  }
+
   public get nameControl(): FormControl {
     return this.joinForm.get('name') as FormControl;
   }
@@ -59,8 +74,8 @@ export class JoinGameFormComponent {
 
 public onSubmit(): void {
     if (this.joinForm.valid) {
-      this.userCreated.emit(this.joinForm.value);
-      this.joinForm.reset();
+      const formData = this.joinForm.getRawValue();
+      this.userCreated.emit(formData);
     } else {
       this.joinForm.markAllAsTouched();
     }

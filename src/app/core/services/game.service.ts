@@ -10,22 +10,14 @@ export type GamePhase = 'voting' | 'loading' | 'revealed';
 export class GameService {
   private readonly STORAGE_KEY = 'planning_poker_game';
   private readonly USER_KEY = 'planning_poker_user';
-
-  // Signals de Estado
   private readonly gameSignal = signal<Game | null>(this.loadGameFromStorage());
   private readonly currentUserSignal = signal<User | null>(this.loadUserFromStorage());
-
-  // Jugadores en la mesa
   private readonly _players = signal<User[]>([]);
-
   private readonly _phase = signal<GamePhase>('voting');
-
-  // Signals para los componentes
   public readonly currentGame = this.gameSignal.asReadonly();
   public readonly currentUser = this.currentUserSignal.asReadonly();
   public readonly players = this._players.asReadonly();
   public readonly phase = this._phase.asReadonly();
-
   public readonly availableCards = signal<(number | string)[]>([
     0,
     1,
@@ -42,9 +34,7 @@ export class GameService {
   ]).asReadonly();
 
   public isGameReady = computed(() => !!this.gameSignal() && !!this.currentUserSignal());
-
   public isAdmin = computed(() => this.currentUser()?.role === 'admin');
-
   // Promedio
   public averageScore = computed(() => {
     const voters = this._players().filter(
@@ -61,7 +51,6 @@ export class GameService {
     return (sum / numericVotes.length).toFixed(1);
   });
 
-  // Resumen de votos para la parte inferior
   public summaryVotes = computed(() => {
     const votes = this._players()
       .filter((p) => p.viewMode === 'player' && p.selectedCard !== null)
@@ -136,11 +125,27 @@ export class GameService {
     localStorage.removeItem(this.USER_KEY);
   }
 
-  public registerUser(
-    userName: string,
-    viewMode: 'player' | 'spectator',
-    inviteGameId?: string
-  ): void {
+  public registerUser(userName: string, viewMode: ViewMode, inviteGameId?: string): void {
+    const existingUser = this.currentUserSignal();
+
+    if (existingUser) {
+      const updatedUser: User = {
+        ...existingUser,
+        name: userName, 
+        viewMode: viewMode,
+        selectedCard: viewMode === 'spectator' ? null : existingUser.selectedCard,
+        hasSelectedCard: viewMode === 'spectator' ? false : existingUser.hasSelectedCard,
+      };
+
+      this.currentUserSignal.set(updatedUser);
+      localStorage.setItem(this.USER_KEY, JSON.stringify(updatedUser));
+
+      this._players.update((players) =>
+        players.map((p) => (p.id === updatedUser.id ? updatedUser : p))
+      );
+      return; 
+    }
+
     const isGuest = !this.gameSignal() && !!inviteGameId;
     const gameId = (inviteGameId || this.gameSignal()?.id)?.trim();
 
@@ -197,31 +202,6 @@ export class GameService {
     }
   }
 
-  private setupInvitationTable(guestUser: User, gameId: string): void {
-    const simulatedAdmin: User = {
-      id: 'admin-123',
-      name: 'Admin (Creador)',
-      role: 'admin' as UserRole,
-      viewMode: 'player' as ViewMode,
-      selectedCard: null,
-      hasSelectedCard: false,
-      gameId,
-    };
-
-    this._players.set([
-      simulatedAdmin,
-      {
-        id: '2',
-        name: 'Alonso Q',
-        role: 'player' as UserRole,
-        viewMode: 'player' as ViewMode,
-        selectedCard: '13',
-        hasSelectedCard: true,
-        gameId,
-      },
-      guestUser,
-    ]);
-  }
 
   public selectCard(value: string | number): void {
     const cardValue = value.toString();

@@ -13,9 +13,9 @@
   @if(gameService.currentUser()){
 
   <div class="header-right">
-    <div class="user-avatar">
+    <button type="button" class="user-avatar" (click)="navigateToEditProfile()">
       {{ gameService.currentUser()?.name?.slice(0, 2) }}
-    </div>
+    </button>
 
     <app-invite-players></app-invite-players>
   </div>

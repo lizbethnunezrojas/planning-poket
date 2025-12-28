@@ -1,4 +1,4 @@
-import { TestBed} from '@angular/core/testing';
+import { TestBed } from '@angular/core/testing';
 import { GameService } from './game.service';
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { User } from '../models/user.model';
@@ -68,9 +68,9 @@ describe('GameService - HU5: Revelar Cartas', () => {
   let service: GameService;
 
   beforeEach(() => {
-    vi.useFakeTimers(); 
+    vi.useFakeTimers();
     TestBed.configureTestingModule({
-      providers: [GameService]
+      providers: [GameService],
     });
     service = TestBed.inject(GameService);
   });
@@ -82,9 +82,33 @@ describe('GameService - HU5: Revelar Cartas', () => {
 
   it('debe calcular el promedio con 1 decimal excluyendo espectadores (Criterio 5)', () => {
     const mockPlayers: User[] = [
-      { id: '1', name: 'P1', role: 'admin', viewMode: 'player', selectedCard: '5', hasSelectedCard: true, gameId: 'g1' },
-      { id: '2', name: 'P2', role: 'player', viewMode: 'player', selectedCard: '13', hasSelectedCard: true, gameId: 'g1' },
-      { id: '3', name: 'E1', role: 'player', viewMode: 'spectator', selectedCard: '21', hasSelectedCard: true, gameId: 'g1' }
+      {
+        id: '1',
+        name: 'P1',
+        role: 'admin',
+        viewMode: 'player',
+        selectedCard: '5',
+        hasSelectedCard: true,
+        gameId: 'g1',
+      },
+      {
+        id: '2',
+        name: 'P2',
+        role: 'player',
+        viewMode: 'player',
+        selectedCard: '13',
+        hasSelectedCard: true,
+        gameId: 'g1',
+      },
+      {
+        id: '3',
+        name: 'E1',
+        role: 'player',
+        viewMode: 'spectator',
+        selectedCard: '21',
+        hasSelectedCard: true,
+        gameId: 'g1',
+      },
     ];
 
     (service as any)._players.set(mockPlayers);
@@ -94,21 +118,53 @@ describe('GameService - HU5: Revelar Cartas', () => {
 
   it('debe contar correctamente la cantidad de personas por cada carta (Criterio 4)', () => {
     const mockPlayers: User[] = [
-      { id: '1', name: 'P1', role: 'admin', viewMode: 'player', selectedCard: '8', hasSelectedCard: true, gameId: 'g1' },
-      { id: '2', name: 'P2', role: 'player', viewMode: 'player', selectedCard: '8', hasSelectedCard: true, gameId: 'g1' },
-      { id: '3', name: 'P3', role: 'player', viewMode: 'player', selectedCard: '3', hasSelectedCard: true, gameId: 'g1' }
+      {
+        id: '1',
+        name: 'P1',
+        role: 'admin',
+        viewMode: 'player',
+        selectedCard: '8',
+        hasSelectedCard: true,
+        gameId: 'g1',
+      },
+      {
+        id: '2',
+        name: 'P2',
+        role: 'player',
+        viewMode: 'player',
+        selectedCard: '8',
+        hasSelectedCard: true,
+        gameId: 'g1',
+      },
+      {
+        id: '3',
+        name: 'P3',
+        role: 'player',
+        viewMode: 'player',
+        selectedCard: '3',
+        hasSelectedCard: true,
+        gameId: 'g1',
+      },
     ];
     (service as any)._players.set(mockPlayers);
 
     const summary = service.summaryVotes();
-    
+
     expect(summary).toContainEqual({ value: '8', count: 2 });
     expect(summary).toContainEqual({ value: '3', count: 1 });
   });
 
   it('debe identificar correctamente si el usuario tiene rol administrador (Criterio 1)', () => {
-    const adminUser: User = { id: '1', name: 'Admin', role: 'admin', viewMode: 'player', selectedCard: null, hasSelectedCard: false, gameId: 'g1' };
-    
+    const adminUser: User = {
+      id: '1',
+      name: 'Admin',
+      role: 'admin',
+      viewMode: 'player',
+      selectedCard: null,
+      hasSelectedCard: false,
+      gameId: 'g1',
+    };
+
     (service as any).currentUserSignal.set(adminUser);
     expect(service.isAdmin()).toBe(true);
 
@@ -120,9 +176,9 @@ describe('GameService - HU5: Revelar Cartas', () => {
   it('debe transicionar a fase revealed tras el tiempo de carga', async () => {
     service.revealCards();
     expect(service.phase()).toBe('loading');
-    
-    await vi.advanceTimersByTimeAsync(2000); 
-    
+
+    await vi.advanceTimersByTimeAsync(2000);
+
     expect(service.phase()).toBe('revealed');
   });
 });
@@ -135,10 +191,10 @@ describe('GameService - HU6: Reiniciar Partida', () => {
   beforeEach(() => {
     vi.useFakeTimers();
     TestBed.configureTestingModule({
-      providers: [GameService]
+      providers: [GameService],
     });
     service = TestBed.inject(GameService);
-    
+
     vi.stubGlobal('localStorage', {
       setItem: vi.fn(),
       getItem: vi.fn(),
@@ -150,9 +206,25 @@ describe('GameService - HU6: Reiniciar Partida', () => {
   });
 
   it('debe resetear la fase y limpiar votos si el usuario es admin (Criterios 1 y 2)', () => {
-    const adminUser: User = { id: '1', name: 'Admin', role: 'admin', viewMode: 'player', selectedCard: '8', hasSelectedCard: true, gameId: 'g1' };
-    const playerUser: User = { id: '2', name: 'Luis', role: 'player', viewMode: 'player', selectedCard: '5', hasSelectedCard: true, gameId: 'g1' };
-    
+    const adminUser: User = {
+      id: '1',
+      name: 'Admin',
+      role: 'admin',
+      viewMode: 'player',
+      selectedCard: '8',
+      hasSelectedCard: true,
+      gameId: 'g1',
+    };
+    const playerUser: User = {
+      id: '2',
+      name: 'Luis',
+      role: 'player',
+      viewMode: 'player',
+      selectedCard: '5',
+      hasSelectedCard: true,
+      gameId: 'g1',
+    };
+
     (service as any).currentUserSignal.set(adminUser);
     (service as any)._players.set([adminUser, playerUser]);
     (service as any)._phase.set('revealed');
@@ -160,20 +232,79 @@ describe('GameService - HU6: Reiniciar Partida', () => {
     service.resetGame();
 
     expect(service.phase()).toBe('voting');
-    service.players().forEach(player => {
+    service.players().forEach((player) => {
       expect(player.selectedCard).toBeNull();
       expect(player.hasSelectedCard).toBe(false);
     });
   });
 
   it('NO debe resetear la partida si el usuario no es admin (Criterio 1)', () => {
-    const playerUser: User = { id: '2', name: 'Luis', role: 'player', viewMode: 'player', selectedCard: '5', hasSelectedCard: true, gameId: 'g1' };
-    
+    const playerUser: User = {
+      id: '2',
+      name: 'Luis',
+      role: 'player',
+      viewMode: 'player',
+      selectedCard: '5',
+      hasSelectedCard: true,
+      gameId: 'g1',
+    };
+
     (service as any).currentUserSignal.set(playerUser);
     (service as any)._phase.set('revealed');
 
     service.resetGame();
 
     expect(service.phase()).toBe('revealed');
+  });
+});
+
+// ----------------------------------------------------------------------------
+describe('GameService - HU12: Cambio de Modo de Visualización', () => {
+  let service: GameService;
+
+  let store: Record<string, string> = {};
+
+  beforeEach(() => {
+    store = {};
+
+    vi.stubGlobal('localStorage', {
+      getItem: (key: string) => store[key] || null,
+      setItem: (key: string, value: string) => {
+        store[key] = value;
+      },
+      removeItem: (key: string) => {
+        delete store[key];
+      },
+      clear: () => {
+        store = {};
+      },
+    });
+
+    TestBed.configureTestingModule({});
+    service = TestBed.inject(GameService);
+
+    service.createGame('Partida Pragma');
+  });
+
+  it('debería mantener el mismo ID cuando un usuario existente cambia su modo (HU12)', () => {
+    service.registerUser('Elizabeth', 'player');
+    const initialId = service.currentUser()?.id;
+
+    service.registerUser('Elizabeth', 'spectator');
+    const updatedUser = service.currentUser();
+
+    expect(updatedUser?.id).toBe(initialId);
+    expect(updatedUser?.viewMode).toBe('spectator');
+    expect(updatedUser?.role).toBe('admin');
+  });
+
+  it('debería limpiar la carta seleccionada si el jugador cambia a modo espectador', () => {
+    service.registerUser('Alexa', 'player');
+    service.selectCard('5');
+
+    service.registerUser('Alexa', 'spectator');
+
+    expect(service.currentUser()?.selectedCard).toBeNull();
+    expect(service.currentUser()?.hasSelectedCard).toBe(false);
   });
 });
