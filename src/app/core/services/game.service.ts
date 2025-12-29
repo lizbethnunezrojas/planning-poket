@@ -3,6 +3,12 @@ import { Game } from '../models/game.model';
 import { User, UserRole, ViewMode } from '../models/user.model';
 
 export type GamePhase = 'voting' | 'loading' | 'revealed';
+export interface ScoringMode {
+  id: string;
+  name: string;
+  cards: (number | string)[];
+}
+
 @Injectable({
   providedIn: 'root',
 })
@@ -17,20 +23,28 @@ export class GameService {
   public readonly currentUser = this.currentUserSignal.asReadonly();
   public readonly players = this._players.asReadonly();
   public readonly phase = this._phase.asReadonly();
-  public readonly availableCards = signal<(number | string)[]>([
-    0,
-    1,
-    3,
-    5,
-    8,
-    13,
-    21,
-    34,
-    55,
-    89,
-    '?',
-    '☕',
-  ]).asReadonly();
+ 
+  private readonly SCORING_MODES: ScoringMode[] = [
+    { id: 'tshirt', name: 'T-Shirt', cards: ['XS', 'S', 'M', 'L', 'XL', '?', '☕'] },
+    { id: 'fibonacci', name: 'Fibonacci', cards: [0, 1, 3, 5, 8, 13, 21, 34, 55, 89, '?', '☕'] },
+    { id: 'powers', name: 'Potencias de 2', cards: [0, 1, 2, 4, 8, 16, 32, 64, '?', '☕'] },
+  ];
+
+  private readonly _currentModeId = signal<string>(
+    localStorage.getItem('planning_poker_mode') || this.SCORING_MODES[0].id
+  );
+
+  public readonly availableCards = computed(() => {
+    const mode = this.SCORING_MODES.find(m => m.id === this._currentModeId());
+    return mode ? mode.cards : this.SCORING_MODES[0].cards;
+  });
+
+  public readonly currentModeId = this._currentModeId.asReadonly();
+  public readonly scoringModes = signal<ScoringMode[]>(this.SCORING_MODES).asReadonly();
+
+  public readonly currentModeName = computed(() => {
+    return this.SCORING_MODES.find(m => m.id === this._currentModeId())?.name || '';
+  });
 
   public isGameReady = computed(() => !!this.gameSignal() && !!this.currentUserSignal());
   public isAdmin = computed(() => this.currentUser()?.role === 'admin');
@@ -40,7 +54,6 @@ export class GameService {
     return role === 'admin' || role === 'sub-admin';
   });
 
-  // Promedio
   public averageScore = computed(() => {
     const voters = this._players().filter(
       (p) => p.viewMode === 'player' && p.selectedCard !== null
@@ -74,6 +87,42 @@ export class GameService {
   constructor() {
     this.initializePlayers();
     this.listenToStorageChanges();
+  }
+
+  public changeScoringMode(modeId: string): void {
+    // AC 1: Solo el Admin principal puede cambiar la configuración
+    if (!this.isAdmin()) return;
+
+    // AC 3: Solo se puede cambiar en fase de votación
+    if (this.phase() !== 'voting') {
+      console.warn('Solo se puede cambiar el modo antes de revelar las cartas.');
+      return;
+    }
+
+    // AC 2: Actualizar el ID (el computed availableCards reaccionará)
+    this._currentModeId.set(modeId);
+    localStorage.setItem('planning_poker_mode', modeId);
+
+    // AC 4: Resetear la votación de todos para evitar inconsistencias
+    this.resetVotesInternal();
+  }
+
+  // Refactorizamos el reset para reusarlo
+  private resetVotesInternal(): void {
+    // Limpiar en Storage Global (para otros)
+    this._players.update((players) => {
+      const newList = players.map((p) => ({ ...p, selectedCard: null, hasSelectedCard: false }));
+      localStorage.setItem('planning_poker_players', JSON.stringify(newList));
+      return newList;
+    });
+
+    // Limpiar mi propia sesión
+    this.currentUserSignal.update((user) => {
+      if (!user) return null;
+      const updated = { ...user, selectedCard: null, hasSelectedCard: false };
+      sessionStorage.setItem(this.USER_KEY, JSON.stringify(updated));
+      return updated;
+    });
   }
 
   public revealCards(): void {
@@ -244,44 +293,29 @@ export class GameService {
     return data ? JSON.parse(data) : null;
   }
 
-  /*   private listenToStorageChanges(): void {
-    globalThis.addEventListener('storage', (event) => {
-      if (event.key === 'planning_poker_phase' && event.newValue) {
-        this._phase.set(event.newValue as GamePhase);
-      }
-
-      if (event.key === 'planning_poker_players' && event.newValue) {
-        this._players.set(JSON.parse(event.newValue));
-      }
-    });
-  } */
-
   private listenToStorageChanges(): void {
     globalThis.addEventListener('storage', (event) => {
-      // Sincronizar Fases (Votando/Revelando)
       if (event.key === 'planning_poker_phase' && event.newValue) {
         this._phase.set(event.newValue as GamePhase);
       }
 
-      // Sincronizar Jugadores y Roles
       if (event.key === 'planning_poker_players' && event.newValue) {
         const updatedPlayers: User[] = JSON.parse(event.newValue);
         this._players.set(updatedPlayers);
 
-        // --- LA LÓGICA DE IDENTIDAD ---
         const myCurrentId = this.currentUserSignal()?.id;
-        // Busco mis propios datos en la lista nueva que llegó al Storage
         const myNewData = updatedPlayers.find((p) => p.id === myCurrentId);
 
-        // Si mi rol en el storage cambió (porque Elizabeth me promovió)...
         if (myNewData && myNewData.role !== this.currentUserSignal()?.role) {
-          // 1. Actualizo mi señal local (esto activa los botones de inmediato)
           this.currentUserSignal.set(myNewData);
-          // 2. Lo guardo en mi sesión para que no se pierda al refrescar
           sessionStorage.setItem(this.USER_KEY, JSON.stringify(myNewData));
 
           console.log(`Sistema: Tu rol ha cambiado a ${myNewData.role}`);
         }
+      }
+
+      if (event.key === 'planning_poker_mode' && event.newValue) {
+        this._currentModeId.set(event.newValue);
       }
     });
   }
