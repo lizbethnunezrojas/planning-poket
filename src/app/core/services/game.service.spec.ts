@@ -9,11 +9,9 @@ describe('GameService - Pruebas Integradas (HU4 a HU13)', () => {
   let sessionStore: Record<string, string> = {};
 
   beforeEach(() => {
-    // Reiniciar almacenes ficticios
     localStore = {};
     sessionStore = {};
 
-    // Mock centralizado de Storage
     vi.stubGlobal('localStorage', {
       getItem: (key: string) => localStore[key] || null,
       setItem: (key: string, value: string) => {
@@ -37,7 +35,6 @@ describe('GameService - Pruebas Integradas (HU4 a HU13)', () => {
       },
     });
 
-    // HIDRATACIÓN
     localStore['planning_poker_game'] = JSON.stringify({ id: 'GAME-123', name: 'Sprint Test' });
 
     TestBed.configureTestingModule({
@@ -117,14 +114,11 @@ describe('GameService - Pruebas Integradas (HU4 a HU13)', () => {
     });
   });
 
-  // ROLES Y PERMISOS HU13
   describe('Gestión de Roles (HU13)', () => {
     it('debe permitir que Admin y Sub-Admin gestionen el juego', () => {
-      // Caso Sub-Admin
       (service as any).currentUserSignal.set({ role: 'sub-admin' });
       expect(service.canManageGame()).toBe(true);
 
-      // Caso Player
       (service as any).currentUserSignal.set({ role: 'player' });
       expect(service.canManageGame()).toBe(false);
     });
@@ -149,5 +143,73 @@ describe('GameService - Pruebas Integradas (HU4 a HU13)', () => {
       service.toggleSubAdmin('2');
       expect(service.players()[1].role).toBe('sub-admin');
     });
+  });
+});
+
+describe('GameService - HU14: Cambio de Modo de Puntaje', () => {
+  let service: GameService;
+
+  beforeEach(() => {
+    // Setup con hidratación previa para tener un juego activo
+    const localStore: Record<string, string> = {
+      'planning_poker_game': JSON.stringify({ id: 'G1', name: 'Test' })
+    };
+    vi.stubGlobal('localStorage', {
+      getItem: (key: string) => localStore[key] || null,
+      setItem: (key: string, value: string) => { localStore[key] = value; },
+    });
+
+    TestBed.configureTestingModule({ providers: [GameService] });
+    service = TestBed.inject(GameService);
+  });
+
+  it('debe seleccionar por defecto la primera opción de la lista (AC 5)', () => {
+    expect(service.currentModeId()).toBe('fibonacci');
+    expect(service.availableCards()).toContain(3);
+    expect(service.availableCards()).toContain(89);
+  });
+
+  it('solo el administrador debe poder cambiar el modo (AC 1)', () => {
+    const player: User = { id: '2', role: 'player' } as any;
+    (service as any).currentUserSignal.set(player);
+
+    service.changeScoringMode('tshirt');
+
+    expect(service.currentModeId()).toBe('fibonacci');
+  });
+
+  it('solo debe permitir el cambio si la fase es "voting" (AC 3)', () => {
+    const admin: User = { id: '1', role: 'admin' } as any;
+    (service as any).currentUserSignal.set(admin);
+    (service as any)._phase.set('revealed'); 
+
+    service.changeScoringMode('tshirt');
+
+    expect(service.currentModeId()).toBe('fibonacci');
+  });
+
+it('debe cambiar las cartas disponibles al elegir un nuevo modo (AC 2, AC 6)', () => {
+  const admin: User = { id: '1', role: 'admin' } as any;
+  (service as any).currentUserSignal.set(admin);
+
+  service.changeScoringMode('powers'); 
+
+  expect(service.currentModeId()).toBe('powers');
+  expect(service.availableCards()).toContain(64); 
+  expect(service.availableCards()).not.toContain(89); 
+});
+
+  it('debe resetear la votación de todos los jugadores al cambiar el modo (AC 4)', () => {
+    const admin: User = { id: '1', role: 'admin' } as any;
+    const player: User = { id: '2', name: 'Alonso', selectedCard: '8', hasSelectedCard: true } as any;
+    
+    (service as any).currentUserSignal.set(admin);
+    (service as any)._players.set([admin, player]);
+
+    service.changeScoringMode('powers');
+
+    const updatedPlayer = service.players().find(p => p.name === 'Alonso');
+    expect(updatedPlayer?.selectedCard).toBeNull();
+    expect(updatedPlayer?.hasSelectedCard).toBe(false);
   });
 });

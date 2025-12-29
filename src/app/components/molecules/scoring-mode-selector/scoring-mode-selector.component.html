@@ -1,0 +1,36 @@
+@if (gameService.isAdmin() && gameService.phase() === 'voting') {
+<div class="scoring-config">
+  <button 
+    type="button" 
+    class="btn-config" 
+    (click)="toggleDropdown()"
+    [attr.aria-expanded]="isDropdownOpen()"
+    aria-haspopup="true"
+    id="scoring-menu-button"
+  >
+    <span class="icon">⚙️</span>
+    <span class="current-mode-text">{{ gameService.currentModeName() }}</span>
+  </button>
+
+  @if (isDropdownOpen()) {
+    <div 
+      class="dropdown-menu" 
+      role="menu" 
+      aria-labelledby="scoring-menu-button"
+    >
+      @for (mode of gameService.scoringModes(); track mode.id) {
+        <button 
+          type="button"
+          class="dropdown-item" 
+          [class.is-active]="mode.id === gameService.currentModeId()"
+          (click)="selectMode(mode.id)"
+          role="menuitem"
+          tabindex="0"
+        >
+          {{ mode.name }}
+        </button>
+      }
+    </div>
+  }
+</div>
+}

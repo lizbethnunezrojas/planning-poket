@@ -14,65 +14,67 @@ describe('CardDeckComponent - HU10: Selección de Cartas', () => {
     cards: (number | string)[] = [1, 2, 3, 5],
     selectedCard: string | null = null
   ) => {
+    const mockService = {
+      availableCards: signal(cards),
+      currentUser: signal({
+        id: 'user-123',
+        name: 'Usuario Test',
+        role: role,
+        viewMode: viewMode,
+        gameId: 'game-1',
+        selectedCard: selectedCard,
+      }),
+      currentModeId: signal('fibonacci'),
+      currentModeName: signal('Fibonacci'),
+      selectCard: mockSelectCard,
+    };
+
     return await render(CardDeckComponent, {
       imports: [CardComponent],
-      providers: [
-        {
-          provide: GameService,
-          useValue: {
-            availableCards: signal(cards),
-            currentUser: signal({
-              id: 'user-123',
-              name: 'Usuario Test',
-              role: role,
-              viewMode: viewMode,
-              gameId: 'game-1',
-              selectedCard: selectedCard,
-            }),
-            selectCard: mockSelectCard,
-          },
-        },
-      ],
+      providers: [{ provide: GameService, useValue: mockService }],
     });
   };
 
-  it('debería mostrar el mazo si el usuario es ADMIN pero está en modo "player" (Caso Elizabeth)', async () => {
+  it('debería mostrar el mazo si el usuario es ADMIN pero está en modo "player"', async () => {
     await setup('player', 'admin');
     const title = screen.queryByText(/Elige una carta/i);
     expect(title).not.toBeNull();
   });
 
-  it('NO debería mostrar el mazo si el usuario es "spectator" aunque sea Admin (AC1)', async () => {
+  it('NO debería mostrar el mazo si el usuario es "spectator" aunque sea Admin', async () => {
     const { container } = await setup('spectator', 'admin');
-    const deckContainer = container.querySelector('.card-deck');
-    expect(deckContainer).toBeNull();
+    const deckSection = container.querySelector('.card-deck');
+    expect(deckSection).toBeNull();
   });
 
-  it('debería mostrar un mensaje cuando no hay ninguna carta registrada (AC4)', async () => {
+  it('debería mostrar un mensaje cuando no hay ninguna carta registrada', async () => {
     await setup('player', 'player', []);
     const emptyMessage = screen.getByText(/No hay cartas registradas/i);
     expect(emptyMessage).toBeTruthy();
   });
 
-  it('debería llamar al servicio con el puntaje correcto al elegir una carta (AC2, AC3, AC5)', async () => {
+  it('debería llamar al servicio con el puntaje correcto al elegir una carta', async () => {
     const cards = [1, 3, 5];
     await setup('player', 'player', cards);
-    const cardToSelect = screen.getByText('3');
 
+    const cardToSelect = screen.getByText('3');
     fireEvent.click(cardToSelect);
+
     expect(mockSelectCard).toHaveBeenCalledWith(3);
   });
 
-  it('debería resaltar visualmente la carta seleccionada (Feedback Visual)', async () => {
+  it('debería resaltar visualmente la carta seleccionada', async () => {
     const { container } = await setup('player', 'player', [1, 3, 5], '5');
 
-    const selectedTrack = container.querySelector('.card--selected');
-    expect(selectedTrack?.textContent).toContain('5');
+    const selectedElement = container.querySelector('.card--selected');
+    expect(selectedElement).not.toBeNull();
+    expect(selectedElement?.textContent).toContain('5');
   });
 
-  it('debería renderizar la cantidad correcta de cartas dinámicamente (AC4)', async () => {
+  it('debería renderizar la cantidad correcta de cartas dinámicamente', async () => {
     const cards = [0, 1, 2, 3, 5, 8];
     const { container } = await setup('player', 'player', cards);
+
     const cardElements = container.querySelectorAll('app-card');
     expect(cardElements.length).toBe(cards.length);
   });

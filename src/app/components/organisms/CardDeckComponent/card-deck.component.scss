@@ -4,11 +4,15 @@
   align-items: center;
   gap: 23px;
   width: 100%;
-  &__title {
+  &__title, &__subtitle {
     color: #ffffff;
     font-size: 1.3rem;
     font-weight: 600;
     margin: 0;
+  }
+
+  &__title{
+    padding: 12px;
   }
 
   &__grid {
@@ -56,4 +60,14 @@
       transition: all 0.4s;
     }
   }
+}
+
+.neon-pulse {
+  animation: neonGlow 1s ease-in-out infinite;
+  color: #e4a4ff !important;
+}
+
+@keyframes neonGlow {
+  0%, 100% { text-shadow: 0 0 2px #3b2c46db, 0 0 4px #371a4ae2; }
+  50% { text-shadow: 0 0 3px #a68fafd0, 0 0 5px #9f66bade, 0 0 8px #9542bbe2; }
 }

@@ -3,12 +3,13 @@ import { GameService } from '../../../core/services/game.service';
 import { InvitePlayersComponent } from '../../molecules/invite-players/invite-players.component';
 import { CapitalizeWordsPipe } from '../../../shared/capitalize-words.pipe';
 import { Router } from '@angular/router';
+import { ScoringModeSelectorComponent } from '../../molecules/scoring-mode-selector/scoring-mode-selector.component';
 
 
 @Component({
   selector: 'app-header',
   standalone: true,
-  imports: [InvitePlayersComponent, CapitalizeWordsPipe],
+  imports: [InvitePlayersComponent, CapitalizeWordsPipe, ScoringModeSelectorComponent],
   templateUrl: './header.component.html',
   styleUrls: ['./header.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,

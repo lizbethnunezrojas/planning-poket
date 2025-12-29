@@ -23,9 +23,9 @@ export class GameService {
   public readonly currentUser = this.currentUserSignal.asReadonly();
   public readonly players = this._players.asReadonly();
   public readonly phase = this._phase.asReadonly();
- 
+
   private readonly SCORING_MODES: ScoringMode[] = [
-    { id: 'tshirt', name: 'T-Shirt', cards: ['XS', 'S', 'M', 'L', 'XL', '?', '☕'] },
+    /* { id: 'tshirt', name: 'T-Shirt', cards: ['XS', 'S', 'M', 'L', 'XL', '?', '☕'] }, */
     { id: 'fibonacci', name: 'Fibonacci', cards: [0, 1, 3, 5, 8, 13, 21, 34, 55, 89, '?', '☕'] },
     { id: 'powers', name: 'Potencias de 2', cards: [0, 1, 2, 4, 8, 16, 32, 64, '?', '☕'] },
   ];
@@ -35,7 +35,7 @@ export class GameService {
   );
 
   public readonly availableCards = computed(() => {
-    const mode = this.SCORING_MODES.find(m => m.id === this._currentModeId());
+    const mode = this.SCORING_MODES.find((m) => m.id === this._currentModeId());
     return mode ? mode.cards : this.SCORING_MODES[0].cards;
   });
 
@@ -43,7 +43,7 @@ export class GameService {
   public readonly scoringModes = signal<ScoringMode[]>(this.SCORING_MODES).asReadonly();
 
   public readonly currentModeName = computed(() => {
-    return this.SCORING_MODES.find(m => m.id === this._currentModeId())?.name || '';
+    return this.SCORING_MODES.find((m) => m.id === this._currentModeId())?.name || '';
   });
 
   public isGameReady = computed(() => !!this.gameSignal() && !!this.currentUserSignal());
@@ -90,26 +90,20 @@ export class GameService {
   }
 
   public changeScoringMode(modeId: string): void {
-    // AC 1: Solo el Admin principal puede cambiar la configuración
     if (!this.isAdmin()) return;
 
-    // AC 3: Solo se puede cambiar en fase de votación
     if (this.phase() !== 'voting') {
       console.warn('Solo se puede cambiar el modo antes de revelar las cartas.');
       return;
     }
 
-    // AC 2: Actualizar el ID (el computed availableCards reaccionará)
     this._currentModeId.set(modeId);
     localStorage.setItem('planning_poker_mode', modeId);
 
-    // AC 4: Resetear la votación de todos para evitar inconsistencias
     this.resetVotesInternal();
   }
 
-  // Refactorizamos el reset para reusarlo
   private resetVotesInternal(): void {
-    // Limpiar en Storage Global (para otros)
     this._players.update((players) => {
       const newList = players.map((p) => ({ ...p, selectedCard: null, hasSelectedCard: false }));
       localStorage.setItem('planning_poker_players', JSON.stringify(newList));
@@ -317,7 +311,22 @@ export class GameService {
       if (event.key === 'planning_poker_mode' && event.newValue) {
         this._currentModeId.set(event.newValue);
       }
+
+      if (event.key === 'planning_poker_mode' && event.newValue) {
+      this._currentModeId.set(event.newValue);
+
+      this.currentUserSignal.update((user) => {
+        if (!user) return null;
+        const updated = { ...user, selectedCard: null, hasSelectedCard: false };
+        sessionStorage.setItem(this.USER_KEY, JSON.stringify(updated));
+        return updated;
+      });
+
+      console.log('Sistema: Modo de juego cambiado. Votos reseteados.');
+    }
     });
+
+    
   }
 
   public toggleSubAdmin(userId: string): void {

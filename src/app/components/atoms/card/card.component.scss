@@ -46,6 +46,11 @@
       justify-content: center;
       align-items: center;
       box-sizing: border-box;
+      transition: 0.3s;
+    }
+
+    &.card--revealed:hover {
+      box-shadow: 0 0 12px #844fe0b2;
     }
 
     &.card--hidden {
