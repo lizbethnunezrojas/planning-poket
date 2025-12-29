@@ -1,0 +1,26 @@
+<div
+  class="seat-wrapper"
+  (click)="toggleMenu($event)"
+  (keydown.enter)="toggleMenu($event)"
+  (keydown.space)="toggleMenu($event)"
+  [attr.tabindex]="canManage() ? 0 : -1"
+  [attr.role]="canManage() ? 'button' : null"
+  [class.clickable]="canManage()"
+>
+  <app-card
+    [userName]="player().name"
+    [viewMode]="player().viewMode"
+    [value]="player().selectedCard ?? null"
+    [isRevealed]="isRevealed()"
+  ></app-card>
+
+  @if (player().role === 'sub-admin') {
+  <div class="badge-subadmin" title="Sub-Administrador">⭐</div>
+  } @if (isMenuOpen()) {
+  <div class="admin-popover">
+    <button (click)="handlePromote()">
+      {{ player().role === 'sub-admin' ? 'Quitar Sub-Admin' : 'Hacer Sub-Admin' }}
+    </button>
+  </div>
+  }
+</div>

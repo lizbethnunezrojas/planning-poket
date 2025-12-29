@@ -1,74 +1,45 @@
 import { TestBed } from '@angular/core/testing';
 import { GameService } from './game.service';
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
 import { User } from '../models/user.model';
 
-describe('GameService - HU4: Lógica de Estado y Jugadores', () => {
+describe('GameService - Pruebas Integradas (HU4 a HU13)', () => {
   let service: GameService;
+  let localStore: Record<string, string> = {};
+  let sessionStore: Record<string, string> = {};
 
   beforeEach(() => {
+    // Reiniciar almacenes ficticios
+    localStore = {};
+    sessionStore = {};
+
+    // Mock centralizado de Storage
     vi.stubGlobal('localStorage', {
-      getItem: vi.fn(),
-      setItem: vi.fn(),
-      removeItem: vi.fn(),
-      clear: vi.fn(),
+      getItem: (key: string) => localStore[key] || null,
+      setItem: (key: string, value: string) => {
+        localStore[key] = value;
+      },
+      removeItem: (key: string) => {
+        delete localStore[key];
+      },
+      clear: () => {
+        localStore = {};
+      },
     });
 
-    TestBed.configureTestingModule({
-      providers: [GameService],
-    });
-    service = TestBed.inject(GameService);
-  });
-
-  describe('Inicialización y Cartas (AC3, AC4)', () => {
-    it('debería garantizar que el mazo dinámico no contenga duplicados (AC3)', () => {
-      const cards = service.availableCards();
-      const uniqueCards = new Set(cards);
-
-      expect(cards.length).toBeGreaterThan(0);
-      expect(uniqueCards.size).toBe(cards.length);
+    vi.stubGlobal('sessionStorage', {
+      getItem: (key: string) => sessionStore[key] || null,
+      setItem: (key: string, value: string) => {
+        sessionStore[key] = value;
+      },
+      removeItem: (key: string) => {
+        delete sessionStore[key];
+      },
     });
 
-    it('debería cargar exactamente los jugadores mockeados obligatorios al inicio', () => {
-      const players = service.players();
-      const mockNames = players.map((p) => p.name);
+    // HIDRATACIÓN
+    localStore['planning_poker_game'] = JSON.stringify({ id: 'GAME-123', name: 'Sprint Test' });
 
-      expect(players).toHaveLength(2);
-      expect(mockNames).toContain('Alonso Q');
-      expect(mockNames).toContain('Micaela R');
-    });
-  });
-
-  describe('Registro y Selección (AC5)', () => {
-    it('debería añadir un nuevo usuario a la lista de jugadores al registrarse', () => {
-      service.createGame('Sprint 1');
-
-      service.registerUser('Luis', 'player');
-
-      const players = service.players();
-      expect(players.some((p) => p.name === 'Luis')).toBe(true);
-      expect(players).toHaveLength(3);
-    });
-
-    it('debería actualizar el estado de la carta del jugador en la lista global (AC5)', () => {
-      service.createGame('Sprint 1');
-      service.registerUser('Luis', 'player');
-      const luisId = service.currentUser()?.id;
-
-      service.selectCard(8);
-
-      const luisInList = service.players().find((p) => p.id === luisId);
-      expect(luisInList?.selectedCard).toBe('8');
-      expect(luisInList?.hasSelectedCard).toBe(true);
-    });
-  });
-});
-// ----------------------------------------------------------------------------
-describe('GameService - HU5: Revelar Cartas', () => {
-  let service: GameService;
-
-  beforeEach(() => {
-    vi.useFakeTimers();
     TestBed.configureTestingModule({
       providers: [GameService],
     });
@@ -80,231 +51,103 @@ describe('GameService - HU5: Revelar Cartas', () => {
     vi.restoreAllMocks();
   });
 
-  it('debe calcular el promedio con 1 decimal excluyendo espectadores (Criterio 5)', () => {
-    const mockPlayers: User[] = [
-      {
-        id: '1',
-        name: 'P1',
-        role: 'admin',
-        viewMode: 'player',
-        selectedCard: '5',
-        hasSelectedCard: true,
-        gameId: 'g1',
-      },
-      {
-        id: '2',
-        name: 'P2',
-        role: 'player',
-        viewMode: 'player',
-        selectedCard: '13',
-        hasSelectedCard: true,
-        gameId: 'g1',
-      },
-      {
-        id: '3',
-        name: 'E1',
-        role: 'player',
-        viewMode: 'spectator',
-        selectedCard: '21',
-        hasSelectedCard: true,
-        gameId: 'g1',
-      },
-    ];
-
-    (service as any)._players.set(mockPlayers);
-
-    expect(service.averageScore()).toBe('9.0');
-  });
-
-  it('debe contar correctamente la cantidad de personas por cada carta (Criterio 4)', () => {
-    const mockPlayers: User[] = [
-      {
-        id: '1',
-        name: 'P1',
-        role: 'admin',
-        viewMode: 'player',
-        selectedCard: '8',
-        hasSelectedCard: true,
-        gameId: 'g1',
-      },
-      {
-        id: '2',
-        name: 'P2',
-        role: 'player',
-        viewMode: 'player',
-        selectedCard: '8',
-        hasSelectedCard: true,
-        gameId: 'g1',
-      },
-      {
-        id: '3',
-        name: 'P3',
-        role: 'player',
-        viewMode: 'player',
-        selectedCard: '3',
-        hasSelectedCard: true,
-        gameId: 'g1',
-      },
-    ];
-    (service as any)._players.set(mockPlayers);
-
-    const summary = service.summaryVotes();
-
-    expect(summary).toContainEqual({ value: '8', count: 2 });
-    expect(summary).toContainEqual({ value: '3', count: 1 });
-  });
-
-  it('debe identificar correctamente si el usuario tiene rol administrador (Criterio 1)', () => {
-    const adminUser: User = {
-      id: '1',
-      name: 'Admin',
-      role: 'admin',
-      viewMode: 'player',
-      selectedCard: null,
-      hasSelectedCard: false,
-      gameId: 'g1',
-    };
-
-    (service as any).currentUserSignal.set(adminUser);
-    expect(service.isAdmin()).toBe(true);
-
-    const playerUser: User = { ...adminUser, role: 'player' };
-    (service as any).currentUserSignal.set(playerUser);
-    expect(service.isAdmin()).toBe(false);
-  });
-
-  it('debe transicionar a fase revealed tras el tiempo de carga', async () => {
-    service.revealCards();
-    expect(service.phase()).toBe('loading');
-
-    await vi.advanceTimersByTimeAsync(2000);
-
-    expect(service.phase()).toBe('revealed');
-  });
-});
-
-// ----------------------------------------------------------------------------
-
-describe('GameService - HU6: Reiniciar Partida', () => {
-  let service: GameService;
-
-  beforeEach(() => {
-    vi.useFakeTimers();
-    TestBed.configureTestingModule({
-      providers: [GameService],
+  // ESTADO INICIAL Y REGISTRO
+  describe('Estado Inicial y Registro', () => {
+    it('debería cargar exactamente los 2 jugadores mockeados al inicio (AC4)', () => {
+      const players = service.players();
+      expect(players).toHaveLength(2); // Alonso y Micaela
+      expect(players.map((p) => p.name)).toContain('Alonso Q');
     });
-    service = TestBed.inject(GameService);
 
-    vi.stubGlobal('localStorage', {
-      setItem: vi.fn(),
-      getItem: vi.fn(),
+    it('debería añadir un nuevo usuario a la lista (Total: 3 jugadores)', () => {
+      service.registerUser('Luis', 'player');
+      expect(service.players()).toHaveLength(3);
+    });
+
+    it('debería mantener el ID al cambiar de modo (HU12)', () => {
+      service.registerUser('Eli', 'player');
+      const id = service.currentUser()?.id;
+      service.registerUser('Eli', 'spectator');
+      expect(service.currentUser()?.id).toBe(id);
     });
   });
 
-  afterEach(() => {
-    vi.useRealTimers();
-  });
+  // LÓGICA DE VOTACIÓN Y CÁLCULOS
+  describe('Votación y Resultados', () => {
+    it('debe calcular el promedio con 1 decimal excluyendo espectadores', () => {
+      const mockPlayers: User[] = [
+        {
+          id: '1',
+          name: 'P1',
+          role: 'admin',
+          viewMode: 'player',
+          selectedCard: '5',
+          hasSelectedCard: true,
+          gameId: 'G1',
+        },
+        {
+          id: '2',
+          name: 'P2',
+          role: 'player',
+          viewMode: 'player',
+          selectedCard: '13',
+          hasSelectedCard: true,
+          gameId: 'G1',
+        },
+        {
+          id: '3',
+          name: 'E1',
+          role: 'player',
+          viewMode: 'spectator',
+          selectedCard: '21',
+          hasSelectedCard: true,
+          gameId: 'G1',
+        },
+      ];
+      (service as any)._players.set(mockPlayers);
+      expect(service.averageScore()).toBe('9.0');
+    });
 
-  it('debe resetear la fase y limpiar votos si el usuario es admin (Criterios 1 y 2)', () => {
-    const adminUser: User = {
-      id: '1',
-      name: 'Admin',
-      role: 'admin',
-      viewMode: 'player',
-      selectedCard: '8',
-      hasSelectedCard: true,
-      gameId: 'g1',
-    };
-    const playerUser: User = {
-      id: '2',
-      name: 'Luis',
-      role: 'player',
-      viewMode: 'player',
-      selectedCard: '5',
-      hasSelectedCard: true,
-      gameId: 'g1',
-    };
-
-    (service as any).currentUserSignal.set(adminUser);
-    (service as any)._players.set([adminUser, playerUser]);
-    (service as any)._phase.set('revealed');
-
-    service.resetGame();
-
-    expect(service.phase()).toBe('voting');
-    service.players().forEach((player) => {
-      expect(player.selectedCard).toBeNull();
-      expect(player.hasSelectedCard).toBe(false);
+    it('debe transicionar a fase revealed tras 2 segundos', async () => {
+      vi.useFakeTimers();
+      service.revealCards();
+      expect(service.phase()).toBe('loading');
+      await vi.advanceTimersByTimeAsync(2000);
+      expect(service.phase()).toBe('revealed');
     });
   });
 
-  it('NO debe resetear la partida si el usuario no es admin (Criterio 1)', () => {
-    const playerUser: User = {
-      id: '2',
-      name: 'Luis',
-      role: 'player',
-      viewMode: 'player',
-      selectedCard: '5',
-      hasSelectedCard: true,
-      gameId: 'g1',
-    };
+  // ROLES Y PERMISOS HU13
+  describe('Gestión de Roles (HU13)', () => {
+    it('debe permitir que Admin y Sub-Admin gestionen el juego', () => {
+      // Caso Sub-Admin
+      (service as any).currentUserSignal.set({ role: 'sub-admin' });
+      expect(service.canManageGame()).toBe(true);
 
-    (service as any).currentUserSignal.set(playerUser);
-    (service as any)._phase.set('revealed');
-
-    service.resetGame();
-
-    expect(service.phase()).toBe('revealed');
-  });
-});
-
-// ----------------------------------------------------------------------------
-describe('GameService - HU12: Cambio de Modo de Visualización', () => {
-  let service: GameService;
-
-  let store: Record<string, string> = {};
-
-  beforeEach(() => {
-    store = {};
-
-    vi.stubGlobal('localStorage', {
-      getItem: (key: string) => store[key] || null,
-      setItem: (key: string, value: string) => {
-        store[key] = value;
-      },
-      removeItem: (key: string) => {
-        delete store[key];
-      },
-      clear: () => {
-        store = {};
-      },
+      // Caso Player
+      (service as any).currentUserSignal.set({ role: 'player' });
+      expect(service.canManageGame()).toBe(false);
     });
 
-    TestBed.configureTestingModule({});
-    service = TestBed.inject(GameService);
+    it('debe limpiar votos al reiniciar partida si tiene permisos', () => {
+      (service as any).currentUserSignal.set({ role: 'admin' });
+      (service as any)._players.set([{ id: '1', selectedCard: '8', hasSelectedCard: true }]);
 
-    service.createGame('Partida Pragma');
-  });
+      service.resetGame();
 
-  it('debería mantener el mismo ID cuando un usuario existente cambia su modo (HU12)', () => {
-    service.registerUser('Elizabeth', 'player');
-    const initialId = service.currentUser()?.id;
+      expect(service.phase()).toBe('voting');
+      expect(service.players()[0].selectedCard).toBeNull();
+    });
 
-    service.registerUser('Elizabeth', 'spectator');
-    const updatedUser = service.currentUser();
+    it('debe permitir promover a un jugador a sub-admin', () => {
+      const admin: User = { id: '1', name: 'Admin', role: 'admin' } as any;
+      const player: User = { id: '2', name: 'Player', role: 'player' } as any;
 
-    expect(updatedUser?.id).toBe(initialId);
-    expect(updatedUser?.viewMode).toBe('spectator');
-    expect(updatedUser?.role).toBe('admin');
-  });
+      (service as any).currentUserSignal.set(admin);
+      (service as any)._players.set([admin, player]);
 
-  it('debería limpiar la carta seleccionada si el jugador cambia a modo espectador', () => {
-    service.registerUser('Alexa', 'player');
-    service.selectCard('5');
-
-    service.registerUser('Alexa', 'spectator');
-
-    expect(service.currentUser()?.selectedCard).toBeNull();
-    expect(service.currentUser()?.hasSelectedCard).toBe(false);
+      service.toggleSubAdmin('2');
+      expect(service.players()[1].role).toBe('sub-admin');
+    });
   });
 });

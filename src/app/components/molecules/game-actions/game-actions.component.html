@@ -1,6 +1,5 @@
 <div class="actions-wrapper">
-  @switch (gameService.phase()) { @case ('voting') { @if (gameService.currentUser()?.role ===
-  'admin') {
+  @switch (gameService.phase()) { @case ('voting') { @if (gameService.canManageGame()) {
   <button class="btn-reveal" [disabled]="!canReveal()" (click)="gameService.revealCards()">
     Revelar cartas
   </button>
@@ -16,7 +15,7 @@
     </div>
     <p class="loading-text">Contando votos</p>
   </div>
-  } @case ('revealed') { @if (gameService.isAdmin()) {
+  } @case ('revealed') { @if (gameService.canManageGame()) {
   <button class="btn-reset" (click)="gameService.resetGame()">Nueva votación</button>
   } } }
 </div>

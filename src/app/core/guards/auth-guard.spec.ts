@@ -6,35 +6,41 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { signal } from '@angular/core';
 
 describe('authGuard - Protección de Rutas', () => {
-  const mockCurrentGame = signal<any>(null);
-  const mockCurrentUser = signal<any>(null);
+  let mockCurrentGame = signal<any>(null);
+  let mockCurrentUser = signal<any>(null);
 
   const mockRouter = {
-    parseUrl: vi.fn((url: string) => ({
-      toString: () => url
-    } as UrlTree)),
+    createUrlTree: vi.fn(
+      (commands: any[]) =>
+        ({
+          toString: () => commands.join('/'),
+        } as unknown as UrlTree)
+    ),
   };
 
   beforeEach(() => {
     vi.clearAllMocks();
+    mockCurrentGame.set(null);
+    mockCurrentUser.set(null);
+
     TestBed.configureTestingModule({
       providers: [
         { provide: Router, useValue: mockRouter },
-        { 
-          provide: GameService, 
-          useValue: { 
+        {
+          provide: GameService,
+          useValue: {
             currentGame: mockCurrentGame,
-            currentUser: mockCurrentUser 
-          } 
-        }
-      ]
+            currentUser: mockCurrentUser,
+          },
+        },
+      ],
     });
   });
 
   const runGuard = (params: any = {}) => {
-    const route = { 
+    const route = {
       params,
-      paramMap: convertToParamMap(params) 
+      paramMap: convertToParamMap(params),
     } as unknown as ActivatedRouteSnapshot;
     return TestBed.runInInjectionContext(() => authGuard(route, {} as any));
   };
@@ -42,43 +48,35 @@ describe('authGuard - Protección de Rutas', () => {
   it('debería permitir el acceso si el ID del juego coincide y hay un usuario (Éxito)', () => {
     const gameId = 'IU1QPU2';
     mockCurrentGame.set({ id: gameId });
-    mockCurrentUser.set({ name: 'Alonso', gameId: gameId });
+    mockCurrentUser.set({ name: 'Elizabeth', gameId: gameId });
 
     const result = runGuard({ id: gameId });
 
     expect(result).toBe(true);
   });
 
-it('debería redirigir a /join/:id si el juego no coincide pero hay un ID en la URL', () => {
-  const targetId = 'abc-456';
-  mockCurrentGame.set(null);
-  mockCurrentUser.set(null);
+  it('debería redirigir a /join/:id si el juego no coincide pero hay un ID en la URL', () => {
+    const targetId = 'abc-456';
+    mockCurrentGame.set(null);
+    mockCurrentUser.set(null);
 
-  const result = runGuard({ id: targetId });
+    const result = runGuard({ id: targetId });
 
-  expect(mockRouter.parseUrl).toHaveBeenCalledWith(`/join/${targetId}`);
-  
-  if (typeof result === 'boolean') {
-    throw new TypeError('Se esperaba un objeto de redirección pero se recibió un booleano');
-  } else {
-    const urlTree = result as UrlTree; 
+    expect(mockRouter.createUrlTree).toHaveBeenCalledWith(['/join', targetId]);
+
+    const urlTree = result as UrlTree;
     expect(urlTree.toString()).toBe(`/join/${targetId}`);
-  }
-});
+  });
 
-it('debería redirigir a /create si no hay ID de juego en la URL ni juego activo', () => {
-  mockCurrentGame.set(null);
-  mockCurrentUser.set(null);
+  it('debería redirigir a /create si no hay ID de juego en la URL ni juego activo', () => {
+    mockCurrentGame.set(null);
+    mockCurrentUser.set(null);
 
-  const result = runGuard({}); 
+    const result = runGuard({});
 
-  expect(mockRouter.parseUrl).toHaveBeenCalledWith('/create');
-  
-  if (typeof result === 'boolean') {
-    throw new TypeError('Se esperaba un objeto de redirección pero se recibió un booleano');
-  } else {
+    expect(mockRouter.createUrlTree).toHaveBeenCalledWith(['/create']);
+
     const urlTree = result as UrlTree;
     expect(urlTree.toString()).toBe('/create');
-  }
-});
+  });
 });

@@ -8,13 +8,8 @@
   @for (seatId of SEAT_ORDER; track seatId) {
   <div [class]="['seat-container', 'seat-' + seatId]">
     @if (playersInSeats()[seatId]; as player) {
-    <app-card
-      [userName]="player.name"
-      [viewMode]="player.viewMode"
-      [value]="player.selectedCard ?? null"
-      [isRevealed]="gameService.phase() === 'revealed'"
-    >
-    </app-card>
+    <app-player-seat [player]="player" [isRevealed]="gameService.phase() === 'revealed'">
+    </app-player-seat>
     } @else {
     <div class="empty-seat">
       <div class="placeholder-card"></div>
@@ -23,5 +18,4 @@
     }
   </div>
   }
-
 </div>

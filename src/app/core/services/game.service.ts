@@ -34,6 +34,12 @@ export class GameService {
 
   public isGameReady = computed(() => !!this.gameSignal() && !!this.currentUserSignal());
   public isAdmin = computed(() => this.currentUser()?.role === 'admin');
+
+  public canManageGame = computed(() => {
+    const role = this.currentUser()?.role;
+    return role === 'admin' || role === 'sub-admin';
+  });
+
   // Promedio
   public averageScore = computed(() => {
     const voters = this._players().filter(
@@ -238,17 +244,47 @@ export class GameService {
     return data ? JSON.parse(data) : null;
   }
 
-    private listenToStorageChanges(): void {
-  globalThis.addEventListener('storage', (event) => {
-    if (event.key === 'planning_poker_phase' && event.newValue) {
-      this._phase.set(event.newValue as GamePhase);
-    }
+  /*   private listenToStorageChanges(): void {
+    globalThis.addEventListener('storage', (event) => {
+      if (event.key === 'planning_poker_phase' && event.newValue) {
+        this._phase.set(event.newValue as GamePhase);
+      }
 
-    if (event.key === 'planning_poker_players' && event.newValue) {
-      this._players.set(JSON.parse(event.newValue));
-    }
-  });
-}
+      if (event.key === 'planning_poker_players' && event.newValue) {
+        this._players.set(JSON.parse(event.newValue));
+      }
+    });
+  } */
+
+  private listenToStorageChanges(): void {
+    globalThis.addEventListener('storage', (event) => {
+      // Sincronizar Fases (Votando/Revelando)
+      if (event.key === 'planning_poker_phase' && event.newValue) {
+        this._phase.set(event.newValue as GamePhase);
+      }
+
+      // Sincronizar Jugadores y Roles
+      if (event.key === 'planning_poker_players' && event.newValue) {
+        const updatedPlayers: User[] = JSON.parse(event.newValue);
+        this._players.set(updatedPlayers);
+
+        // --- LA LÓGICA DE IDENTIDAD ---
+        const myCurrentId = this.currentUserSignal()?.id;
+        // Busco mis propios datos en la lista nueva que llegó al Storage
+        const myNewData = updatedPlayers.find((p) => p.id === myCurrentId);
+
+        // Si mi rol en el storage cambió (porque Elizabeth me promovió)...
+        if (myNewData && myNewData.role !== this.currentUserSignal()?.role) {
+          // 1. Actualizo mi señal local (esto activa los botones de inmediato)
+          this.currentUserSignal.set(myNewData);
+          // 2. Lo guardo en mi sesión para que no se pierda al refrescar
+          sessionStorage.setItem(this.USER_KEY, JSON.stringify(myNewData));
+
+          console.log(`Sistema: Tu rol ha cambiado a ${myNewData.role}`);
+        }
+      }
+    });
+  }
 
   public toggleSubAdmin(userId: string): void {
     if (this.currentUser()?.role !== 'admin') return;

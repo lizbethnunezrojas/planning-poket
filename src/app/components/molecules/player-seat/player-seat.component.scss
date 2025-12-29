@@ -1,0 +1,51 @@
+.seat-wrapper {
+  position: relative; // Para que el popover flote respecto a la carta
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  &.clickable {
+    cursor: pointer;
+  }
+
+  .badge-subadmin {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    background: #ffd700;
+    border: 1px solid #333;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 12px;
+    z-index: 2;
+  }
+
+  .admin-popover {
+    position: absolute;
+    bottom: -45px; // Aparece debajo del nombre
+    background: #330072;
+    border: 1px solid #bb65ff;
+    border-radius: 6px;
+    padding: 5px;
+    z-index: 100;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+
+    button {
+      background: transparent;
+      color: white;
+      border: none;
+      white-space: nowrap;
+      padding: 5px 10px;
+      cursor: pointer;
+      font-size: 12px;
+
+      &:hover {
+        background: #bb65ff;
+      }
+    }
+  }
+}

@@ -1,15 +1,15 @@
 import { Component, input, computed, ChangeDetectionStrategy, inject } from '@angular/core';
 import { GameTableDesignComponent } from '../../molecules/game-table-design/game-table-design.component';
-import { CardComponent } from '../../atoms/card/card.component';
 
 import { User } from '../../../core/models/user.model';
 import { GameService } from '../../../core/services/game.service';
 import { GameActionsComponent } from '../../molecules/game-actions/game-actions.component';
+import { PlayerSeatComponent } from '../../molecules/player-seat/player-seat.component';
 
 @Component({
   selector: 'app-game-table',
   standalone: true,
-  imports: [GameTableDesignComponent, CardComponent, GameActionsComponent],
+  imports: [GameTableDesignComponent, GameActionsComponent, PlayerSeatComponent],
   templateUrl: './game-table.component.html',
   styleUrls: ['./game-table.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,

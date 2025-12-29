@@ -3,23 +3,35 @@ import { GameTableComponent } from './game-table.component';
 import { GameService } from '../../../core/services/game.service';
 import { signal } from '@angular/core';
 import { describe, it, expect } from 'vitest';
+import { PlayerSeatComponent } from '../../molecules/player-seat/player-seat.component';
 
 describe('GameTableComponent - HU09 & Estabilidad de Mesa', () => {
-  
-  const mockAdmin = { id: '1', name: 'Elizabeth', role: 'admin', viewMode: 'player' };
-  const mockPlayer = { id: '2', name: 'Alexa', role: 'player', viewMode: 'player', selectedCard: '8' };
+  const mockAdmin = { id: '1', name: 'Elizabeth', role: 'admin', gameId: 'g1', viewMode: 'player' };
+  const mockPlayer = {
+    id: '2',
+    name: 'Alexa',
+    role: 'player',
+    gameId: 'g1',
+    viewMode: 'player',
+    selectedCard: '8',
+    hasSelectedCard: true,
+  };
 
+  const createMockService = (currentUser: any, players: any[], phase = 'voting') => ({
+    players: signal(players),
+    currentUser: signal(currentUser),
+    phase: signal(phase),
+    isAdmin: signal(currentUser?.role === 'admin'),
+    canManageGame: signal(currentUser?.role === 'admin' || currentUser?.role === 'sub-admin'),
+    availableCards: signal([1, 2, 3]),
+  });
 
   it('debería renderizar siempre 8 contenedores de asiento (Criterio 3 - Estructura Fija)', async () => {
-    const mockService = {
-      players: signal([mockAdmin]),
-      currentUser: signal(mockAdmin),
-      phase: signal('voting'),
-      isAdmin: signal(true)
-    };
+    const mockService = createMockService(mockAdmin, [mockAdmin]);
 
     const { container } = await render(GameTableComponent, {
-      providers: [{ provide: GameService, useValue: mockService }]
+      imports: [PlayerSeatComponent], // Importante añadir la nueva molécula
+      providers: [{ provide: GameService, useValue: mockService }],
     });
 
     const seats = container.querySelectorAll('.seat-container');
@@ -27,63 +39,46 @@ describe('GameTableComponent - HU09 & Estabilidad de Mesa', () => {
   });
 
   it('debería mostrar "Esperando..." en los asientos que no tienen jugador', async () => {
-    const mockService = {
-      players: signal([mockAdmin]), 
-      currentUser: signal(mockAdmin),
-      phase: signal('voting'),
-      isAdmin: signal(true)
-    };
+    const mockService = createMockService(mockAdmin, [mockAdmin]);
 
     await render(GameTableComponent, {
-      providers: [{ provide: GameService, useValue: mockService }]
+      imports: [PlayerSeatComponent],
+      providers: [{ provide: GameService, useValue: mockService }],
     });
 
     const waitingLabels = screen.getAllByText(/esperando.../i);
     expect(waitingLabels.length).toBe(7);
   });
 
-
   it('debería mostrar el nombre de los jugadores conectados (HU04)', async () => {
-    const mockService = {
-      players: signal([mockAdmin, mockPlayer]),
-      currentUser: signal(mockAdmin),
-      phase: signal('voting'),
-      isAdmin: signal(true)
-    };
+    const mockService = createMockService(mockAdmin, [mockAdmin, mockPlayer]);
 
     await render(GameTableComponent, {
-      providers: [{ provide: GameService, useValue: mockService }]
+      imports: [PlayerSeatComponent],
+      providers: [{ provide: GameService, useValue: mockService }],
     });
 
     expect(screen.getByText(/Elizabeth/i)).toBeTruthy();
     expect(screen.getByText(/Alexa/i)).toBeTruthy();
   });
 
-  it('debería mostrar el botón "Revelar cartas" solo si el usuario es Admin (HU05 - Criterio 1)', async () => {
-    const mockService = {
-      phase: signal('voting'),
-      currentUser: signal(mockAdmin),
-      players: signal([mockAdmin]),
-      isAdmin: signal(true)
-    };
+  it('debería mostrar el botón "Revelar cartas" si el usuario tiene permiso (HU13)', async () => {
+    const mockService = createMockService(mockAdmin, [mockAdmin, mockPlayer]);
 
     await render(GameTableComponent, {
-      providers: [{ provide: GameService, useValue: mockService }]
+      imports: [PlayerSeatComponent],
+      providers: [{ provide: GameService, useValue: mockService }],
     });
 
     expect(screen.getByText(/revelar cartas/i)).toBeTruthy();
   });
 
-  it('debería mostrar los valores de las cartas cuando la fase es "revealed" (HU05 - Criterio 2)', async () => {
-    const mockService = {
-      phase: signal('revealed'),
-      currentUser: signal(mockAdmin),
-      players: signal([mockPlayer]),
-      isAdmin: signal(true)
-    };
+  it('debería mostrar los valores de las cartas cuando la fase es "revealed"', async () => {
+    const mockService = createMockService(mockAdmin, [mockPlayer], 'revealed');
 
     await render(GameTableComponent, {
-      providers: [{ provide: GameService, useValue: mockService }]
+      imports: [PlayerSeatComponent],
+      providers: [{ provide: GameService, useValue: mockService }],
     });
 
     expect(screen.getByText('8')).toBeTruthy();
