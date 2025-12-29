@@ -2,7 +2,6 @@ import { Injectable, signal, computed } from '@angular/core';
 import { Game } from '../models/game.model';
 import { User, UserRole, ViewMode } from '../models/user.model';
 
-// Fases del juego
 export type GamePhase = 'voting' | 'loading' | 'revealed';
 @Injectable({
   providedIn: 'root',
@@ -68,42 +67,61 @@ export class GameService {
 
   constructor() {
     this.initializePlayers();
+    this.listenToStorageChanges();
   }
 
   public revealCards(): void {
+    if (this.currentUser()?.role === 'player') return;
+
     this._phase.set('loading');
+    localStorage.setItem('planning_poker_phase', 'loading');
+
     setTimeout(() => {
       this._phase.set('revealed');
+      localStorage.setItem('planning_poker_phase', 'revealed');
     }, 2000);
   }
 
   private initializePlayers(): void {
     const savedUser = this.loadUserFromStorage();
     const savedGame = this.loadGameFromStorage();
+    if (!savedGame) return;
 
-    const playersList: User[] = [
-      {
-        id: '2',
-        name: 'Alonso Q',
-        role: 'player',
-        viewMode: 'player',
-        selectedCard: '13',
-        hasSelectedCard: false,
-        gameId: 'mock',
-      },
-      {
-        id: '3',
-        name: 'Micaela R',
-        role: 'player',
-        viewMode: 'player',
-        selectedCard: '21',
-        hasSelectedCard: false,
-        gameId: 'mock',
-      },
-    ];
+    const storageData = localStorage.getItem('planning_poker_players');
+    let playersList: User[] = storageData ? JSON.parse(storageData) : [];
 
-    if (savedUser && savedGame && savedUser.gameId === savedGame.id) {
-      playersList.push(savedUser);
+    if (playersList.length === 0) {
+      playersList = [
+        {
+          id: '2',
+          name: 'Alonso Q',
+          role: 'player',
+          viewMode: 'player',
+          selectedCard: '13',
+          hasSelectedCard: true,
+          gameId: savedGame.id,
+        },
+        {
+          id: '3',
+          name: 'Micaela R',
+          role: 'player',
+          viewMode: 'player',
+          selectedCard: '21',
+          hasSelectedCard: true,
+          gameId: savedGame.id,
+        },
+      ];
+      localStorage.setItem('planning_poker_players', JSON.stringify(playersList));
+    }
+
+    if (savedUser && savedUser.gameId === savedGame.id) {
+      const userIndex = playersList.findIndex((p) => p.id === savedUser.id);
+      if (userIndex === -1) {
+        playersList.push(savedUser);
+        localStorage.setItem('planning_poker_players', JSON.stringify(playersList));
+      } else {
+        playersList[userIndex] = savedUser;
+      }
     }
 
     this._players.set(playersList);
@@ -122,7 +140,7 @@ export class GameService {
     localStorage.setItem(this.STORAGE_KEY, JSON.stringify(newGame));
 
     this.currentUserSignal.set(null);
-    localStorage.removeItem(this.USER_KEY);
+    sessionStorage.removeItem(this.USER_KEY);
   }
 
   public registerUser(userName: string, viewMode: ViewMode, inviteGameId?: string): void {
@@ -131,30 +149,26 @@ export class GameService {
     if (existingUser) {
       const updatedUser: User = {
         ...existingUser,
-        name: userName, 
+        name: userName,
         viewMode: viewMode,
         selectedCard: viewMode === 'spectator' ? null : existingUser.selectedCard,
         hasSelectedCard: viewMode === 'spectator' ? false : existingUser.hasSelectedCard,
       };
 
-      this.currentUserSignal.set(updatedUser);
-      localStorage.setItem(this.USER_KEY, JSON.stringify(updatedUser));
-
-      this._players.update((players) =>
-        players.map((p) => (p.id === updatedUser.id ? updatedUser : p))
-      );
-      return; 
+      this.saveUserSession(updatedUser);
+      this.updatePlayerInList(updatedUser);
+      return;
     }
 
-    const isGuest = !this.gameSignal() && !!inviteGameId;
     const gameId = (inviteGameId || this.gameSignal()?.id)?.trim();
 
     if (!gameId) return;
 
-    let userRole: UserRole = 'player';
-    if (!isGuest && !this.currentUserSignal()) {
-      userRole = 'admin';
-    }
+    const storageData = localStorage.getItem('planning_poker_players');
+    const existingPlayers: User[] = storageData ? JSON.parse(storageData) : [];
+
+    const hasAdmin = existingPlayers.some((p) => p.gameId === gameId && p.role === 'admin');
+    const userRole: UserRole = hasAdmin ? 'player' : 'admin';
 
     const newUser: User = {
       id: this.generateUniqueId(),
@@ -166,42 +180,35 @@ export class GameService {
       gameId: gameId,
     };
 
-    this.currentUserSignal.set(newUser);
-    localStorage.setItem(this.USER_KEY, JSON.stringify(newUser));
+    this.saveUserSession(newUser);
 
-    if (isGuest) {
-      const guestGame: Game = { id: gameId, name: 'Sprint 32' };
-      this.gameSignal.set(guestGame);
-      localStorage.setItem(this.STORAGE_KEY, JSON.stringify(guestGame));
-
-      const simulatedAdmin: User = {
-        id: 'admin-123',
-        name: 'Admin (Creador)',
-        role: 'admin' as UserRole,
-        viewMode: 'player' as ViewMode,
-        selectedCard: null,
-        hasSelectedCard: false,
-        gameId,
-      };
-
-      this._players.set([
-        simulatedAdmin,
-        {
-          id: '2',
-          name: 'Alonso Q',
-          role: 'player' as UserRole,
-          viewMode: 'player' as ViewMode,
-          selectedCard: '13',
-          hasSelectedCard: true,
-          gameId,
-        },
-        newUser,
-      ]);
-    } else {
-      this._players.update((players) => [...players, newUser]);
+    if (!this.gameSignal() || this.gameSignal()?.id !== gameId) {
+      const gameData: Game = { id: gameId, name: 'Partida de Poker' };
+      this.gameSignal.set(gameData);
+      localStorage.setItem(this.STORAGE_KEY, JSON.stringify(gameData));
     }
+
+    this._players.update((currentSignalPlayers) => {
+      const isAlreadyInList = existingPlayers.find((p) => p.id === newUser.id);
+      const newList = isAlreadyInList ? existingPlayers : [...existingPlayers, newUser];
+
+      localStorage.setItem('planning_poker_players', JSON.stringify(newList));
+      return newList;
+    });
   }
 
+  private saveUserSession(user: User): void {
+    this.currentUserSignal.set(user);
+    sessionStorage.setItem(this.USER_KEY, JSON.stringify(user));
+  }
+
+  private updatePlayerInList(updatedUser: User): void {
+    this._players.update((players) => {
+      const newList = players.map((p) => (p.id === updatedUser.id ? updatedUser : p));
+      localStorage.setItem('planning_poker_players', JSON.stringify(newList));
+      return newList;
+    });
+  }
 
   public selectCard(value: string | number): void {
     const cardValue = value.toString();
@@ -214,18 +221,11 @@ export class GameService {
         hasSelectedCard: true,
       };
 
-      localStorage.setItem(this.USER_KEY, JSON.stringify(updatedUser));
+      sessionStorage.setItem(this.USER_KEY, JSON.stringify(updatedUser));
+      this.updatePlayerInList(updatedUser);
 
       return updatedUser;
     });
-
-    this._players.update((players) =>
-      players.map((p) =>
-        p.id === this.currentUserSignal()?.id
-          ? { ...p, selectedCard: cardValue, hasSelectedCard: true }
-          : p
-      )
-    );
   }
 
   private loadGameFromStorage(): Game | null {
@@ -234,28 +234,55 @@ export class GameService {
   }
 
   private loadUserFromStorage(): User | null {
-    const data = localStorage.getItem(this.USER_KEY);
+    const data = sessionStorage.getItem(this.USER_KEY);
     return data ? JSON.parse(data) : null;
   }
 
+    private listenToStorageChanges(): void {
+  globalThis.addEventListener('storage', (event) => {
+    if (event.key === 'planning_poker_phase' && event.newValue) {
+      this._phase.set(event.newValue as GamePhase);
+    }
+
+    if (event.key === 'planning_poker_players' && event.newValue) {
+      this._players.set(JSON.parse(event.newValue));
+    }
+  });
+}
+
+  public toggleSubAdmin(userId: string): void {
+    if (this.currentUser()?.role !== 'admin') return;
+
+    this._players.update((players) => {
+      const newList = players.map((p) => {
+        if (p.id === userId) {
+          const newRole: UserRole = p.role === 'sub-admin' ? 'player' : 'sub-admin';
+          return { ...p, role: newRole };
+        }
+        return p;
+      });
+      localStorage.setItem('planning_poker_players', JSON.stringify(newList));
+      return newList;
+    });
+  }
+
   public resetGame(): void {
-    if (!this.isAdmin()) return;
+    if (this.currentUser()?.role === 'player') return;
 
     this._phase.set('voting');
+    localStorage.setItem('planning_poker_phase', 'voting');
 
-    this._players.update((players) =>
-      players.map((player) => ({
-        ...player,
-        selectedCard: null,
-        hasSelectedCard: false,
-      }))
-    );
+    this._players.update((players) => {
+      const newList = players.map((p) => ({ ...p, selectedCard: null, hasSelectedCard: false }));
+      localStorage.setItem('planning_poker_players', JSON.stringify(newList));
+      return newList;
+    });
 
     this.currentUserSignal.update((user) => {
       if (!user) return null;
-      const updatedUser = { ...user, selectedCard: null, hasSelectedCard: false };
-      localStorage.setItem(this.USER_KEY, JSON.stringify(updatedUser));
-      return updatedUser;
+      const updated = { ...user, selectedCard: null, hasSelectedCard: false };
+      sessionStorage.setItem(this.USER_KEY, JSON.stringify(updated));
+      return updated;
     });
   }
 }

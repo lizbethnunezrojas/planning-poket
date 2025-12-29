@@ -1,4 +1,4 @@
-export type UserRole = 'admin' | 'player';
+export type UserRole = 'admin' | 'sub-admin' | 'player';
 export type ViewMode = 'player' | 'spectator';
 
 export interface User {

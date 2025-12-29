@@ -6,7 +6,7 @@ export const authGuard: CanActivateFn = (route, state) => {
   const gameService = inject(GameService);
   const router = inject(Router);
 
-  const gameIdFromUrl = route.paramMap.get('id')?.trim();
+  const gameIdFromUrl = route.params['id'];
   const currentUser = gameService.currentUser();
 
   const userGameId = currentUser?.gameId?.trim();
@@ -18,8 +18,8 @@ export const authGuard: CanActivateFn = (route, state) => {
   }
 
   if (gameIdFromUrl) {
-    return router.parseUrl(`/join/${gameIdFromUrl}`);
+    return router.createUrlTree(['/join', gameIdFromUrl]);
   }
 
-  return router.parseUrl('/create');
+  return router.createUrlTree(['/create']);
 };
