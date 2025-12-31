@@ -1,4 +1,8 @@
-<button class="btn-invite-trigger" (click)="openModal()">Invitar jugadores</button>
+<button class="btn-invite-trigger" (click)="openModal()" aria-label="Invitar jugadores">
+  <span class="icon-mobile" aria-hidden="true">🔗</span>
+
+  <span class="btn-text">Invitar jugadores</span>
+</button>
 
 @if (isModalOpen()) {
 <div class="modal-wrapper">

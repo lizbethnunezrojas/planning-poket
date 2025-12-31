@@ -1,18 +1,39 @@
+@use 'mixins' as *;
+
 .card-deck {
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   gap: 23px;
   width: 100%;
-  &__title, &__subtitle {
-    color: #ffffff;
-    font-size: 1.3rem;
-    font-weight: 600;
-    margin: 0;
+
+  @media (max-width: 1400px) {
+    gap: 2px;
   }
 
-  &__title{
-    padding: 12px;
+  &__title {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    min-height: 100px;
+    font-size: 1.3rem;
+    font-weight: 600;
+
+    @media (min-width: 1024px) and (max-width: 1279px) {
+      flex-direction: row;
+      gap: 20px;
+      min-height: 50px;
+      font-size: 1rem;
+    }
+
+    @include mobile {
+      min-height: 90px;
+      font-size: 16px;
+      gap: 4px;
+    }
   }
 
   &__grid {
@@ -21,6 +42,21 @@
     justify-content: center;
     gap: 17px;
     max-width: 900px;
+
+    @include mobile {
+      flex-wrap: nowrap; 
+      justify-content: flex-start; 
+      overflow-x: auto; 
+      width: 100vw; 
+      padding: 10px 20px 10px; 
+      -webkit-overflow-scrolling: touch; 
+
+      &::-webkit-scrollbar {
+        display: none;
+      }
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
 
     .card-deck__button {
       background: none;
@@ -41,7 +77,10 @@
     width: 48px !important;
     height: 80px !important;
     font-weight: 600;
-    font-family: Poppins, serif;
+    @media (max-width: 1279px) {
+      width: 33px !important;
+      height: 55px !important;
+    }
 
     &.card--revealed {
       color: white;
@@ -68,6 +107,11 @@
 }
 
 @keyframes neonGlow {
-  0%, 100% { text-shadow: 0 0 2px #3b2c46db, 0 0 4px #371a4ae2; }
-  50% { text-shadow: 0 0 3px #a68fafd0, 0 0 5px #9f66bade, 0 0 8px #9542bbe2; }
+  0%,
+  100% {
+    text-shadow: 0 0 2px #3b2c46db, 0 0 4px #371a4ae2;
+  }
+  50% {
+    text-shadow: 0 0 3px #a68fafd0, 0 0 5px #9f66bade, 0 0 8px #9542bbe2;
+  }
 }

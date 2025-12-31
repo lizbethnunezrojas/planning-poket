@@ -1,4 +1,12 @@
-import { ChangeDetectionStrategy, Component, effect, signal, inject, computed, input } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  effect,
+  signal,
+  inject,
+  computed,
+  input,
+} from '@angular/core';
 import { GameService } from '../../../core/services/game.service';
 import { CardComponent } from '../../atoms/card/card.component';
 
@@ -27,16 +35,16 @@ export class CardDeckComponent {
   public shouldDisplay = computed(() => this.isPlayer() || this.isPreview());
 
   constructor() {
-  effect(() => {
-    const mode = this.gameService.currentModeId();
-    if (mode) {
-      this.triggerNeonEffect();
-    }
-  });
-}
+    effect(() => {
+      const mode = this.gameService.currentModeId();
+      if (mode) {
+        this.triggerNeonEffect();
+      }
+    });
+  }
 
-private triggerNeonEffect() {
-  this.isAnimating.set(true);
-  setTimeout(() => this.isAnimating.set(false), 3000);
-}
+  private triggerNeonEffect() {
+    this.isAnimating.set(true);
+    setTimeout(() => this.isAnimating.set(false), 3000);
+  }
 }

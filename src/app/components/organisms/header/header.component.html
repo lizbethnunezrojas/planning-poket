@@ -10,15 +10,21 @@
     <h1 class="game-title">{{ gameService.currentGame()?.name | capitalizeWords }}</h1>
   </div>
 
-  @if(gameService.currentUser()){
-
+  @if(gameService.currentUser()){ @if(gameService.currentUser()){
   <div class="header-right">
-    <button type="button" class="user-avatar" (click)="navigateToEditProfile()">
-      {{ gameService.currentUser()?.name?.slice(0, 2) }}
-    </button>
+    <div class="avatar-container">
+      <button type="button" class="user-avatar" (click)="handleAvatarClick()">
+        {{ gameService.currentUser()?.name?.slice(0, 2) }}
+      </button>
 
-    <app-invite-players></app-invite-players>
-    <app-scoring-mode-selector></app-scoring-mode-selector>
+      @if (isMobile() && isMenuOpen()) {
+      <app-user-action-menu [isAdmin]="gameService.isAdmin()" (action)="onMenuAction($event)">
+      </app-user-action-menu>
+      }
+    </div>
+
+    <app-invite-players class="desktop-only"></app-invite-players>
+    <app-scoring-mode-selector class="desktop-only"></app-scoring-mode-selector>
   </div>
-  }
+  } }
 </header>

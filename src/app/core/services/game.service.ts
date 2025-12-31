@@ -110,7 +110,6 @@ export class GameService {
       return newList;
     });
 
-    // Limpiar mi propia sesión
     this.currentUserSignal.update((user) => {
       if (!user) return null;
       const updated = { ...user, selectedCard: null, hasSelectedCard: false };
@@ -313,20 +312,18 @@ export class GameService {
       }
 
       if (event.key === 'planning_poker_mode' && event.newValue) {
-      this._currentModeId.set(event.newValue);
+        this._currentModeId.set(event.newValue);
 
-      this.currentUserSignal.update((user) => {
-        if (!user) return null;
-        const updated = { ...user, selectedCard: null, hasSelectedCard: false };
-        sessionStorage.setItem(this.USER_KEY, JSON.stringify(updated));
-        return updated;
-      });
+        this.currentUserSignal.update((user) => {
+          if (!user) return null;
+          const updated = { ...user, selectedCard: null, hasSelectedCard: false };
+          sessionStorage.setItem(this.USER_KEY, JSON.stringify(updated));
+          return updated;
+        });
 
-      console.log('Sistema: Modo de juego cambiado. Votos reseteados.');
-    }
+        console.log('Sistema: Modo de juego cambiado. Votos reseteados.');
+      }
     });
-
-    
   }
 
   public toggleSubAdmin(userId: string): void {

@@ -1,15 +1,22 @@
+@use 'mixins' as *;
 .game-board-container {
   display: grid;
-  grid-template-rows: auto 1fr auto;
-  overflow: hidden;
+  grid-template-rows: auto 1fr;
   height: 100vh;
   align-items: center;
 }
 
 .header-space {
-  min-height: 5rem;
-  max-height: 11rem;
+  height: 5rem;
+  @include mobile {
+    height: 4rem;
+  }
+
+  @include desktop {
+    height: 7rem;
+  }
 }
+
 .deck-container {
   overflow-x: auto;
   padding-bottom: clamp(2rem, 8rem, 12rem);
@@ -28,41 +35,4 @@
   justify-content: center;
   align-items: center;
   color: white;
-}
-
-.table-m {
-  width: 603px;
-  height: 345px;
-  border: 2px #6429cd solid;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  border-radius: 276px;
-  box-shadow: 0 0 2px #bdbdff33;
-  box-sizing: border-box;
-
-  .table-s {
-    width: 555px;
-    height: 298px;
-    border: 2px #bdbdff99 solid;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    border-radius: 276px;
-    box-shadow: 0 0 3px #bdbdff99;
-    background-color: transparent;
-
-    .table-xs {
-      width: 521px;
-      height: 272px;
-      border: 1px #6429cd solid;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      border-radius: 276px;
-      box-shadow: 0 0 3px rgba(255, 255, 255, 0.6);
-      background-color: #1f0d3f99;
-      box-sizing: border-box;
-    }
-  }
 }

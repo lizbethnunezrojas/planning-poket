@@ -12,7 +12,8 @@
     [viewMode]="player().viewMode"
     [value]="player().selectedCard ?? null"
     [isRevealed]="isRevealed()"
-  ></app-card>
+  >
+  </app-card>
 
   @if (player().role === 'sub-admin') {
   <div class="badge-subadmin" title="Sub-Administrador">⭐</div>

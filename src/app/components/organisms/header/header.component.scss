@@ -1,45 +1,72 @@
+@use 'mixins' as *;
+
 .game-header {
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
   justify-content: space-between;
   align-items: center;
-  padding: 3rem 5rem;
+  padding: clamp(0rem, 2vh, 2rem);
   height: 5rem;
-  margin-bottom: 5rem;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+
+  @include mobile {
+    padding: 1rem auto;
+  }
 
   .header-left {
     display: flex;
     gap: 13px;
-    font-weight: 600px;
     align-items: center;
-
     .logo {
-      height: 60px;
+      height: clamp(44px, 10vw, 60px);
       width: auto;
     }
 
     .create-game {
-      font-size: 21px;
+      font-weight: 600;
+      font-size: clamp(14px, 3vw, 21px);
     }
   }
 
   .header-center {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex: 1;
+
     .game-title {
-      font-size: 26px;
+      font-size: clamp(16px, 4vw, 26px);
       font-weight: 700;
       margin: 0;
-      text-align: center;
       text-transform: capitalize;
+      text-align: center;
     }
   }
 
   .header-right {
     display: flex;
     align-items: center;
-    gap: 16px;
+    justify-content: end;
+    gap: clamp(8px, 2vw, 16px);
+
+    app-invite-players,
+    app-scoring-mode-selector {
+      @include mobile {
+        display: contents;
+      }
+    }
+
+    .avatar-container {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
 
     .user-avatar {
-      width: 36px;
-      height: 36px;
+      width: clamp(32px, 8vw, 36px);
+      height: clamp(32px, 8vw, 36px);
       background-color: #bdbdff;
       color: #330072;
       border-radius: 50%;
@@ -48,6 +75,7 @@
       align-items: center;
       font-weight: 700;
       font-size: 14px;
+      flex-shrink: 0;
       text-transform: uppercase;
       border: none;
       cursor: pointer;

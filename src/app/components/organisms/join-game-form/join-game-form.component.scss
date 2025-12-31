@@ -1,9 +1,12 @@
+@use 'mixins' as *;
+
 .join-game-container {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  width: 514px;
+  width: clamp(280px, 85vw, 514px);
+  margin: 0 auto;
   height: 294px;
   background-color: #1f0d3f;
   border-radius: 25px;
@@ -15,5 +18,15 @@
   .mode-selector-group{
     margin-top: 19px;
     margin-bottom: 45px;
+  }
+
+  @include mobile {
+    gap: 1.5rem;
+    border-radius: 20px;
+
+    .mode-selector-group{
+      margin-top: 0px;
+      margin-bottom: 20px;
+    }
   }
 }

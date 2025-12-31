@@ -1,9 +1,11 @@
 @if (shouldDisplay()) {
 <section class="card-deck">
-  <h3 class="card-deck__title" [class.neon-pulse]="isAnimating()">
-  Modo: {{ gameService.currentModeName() }}
-</h3>
-<h3 class="card-deck__subtitle">Elige una carta 👇</h3>
+  <div class="card-deck__title">
+    <h3 class="card-deck__title__main" [class.neon-pulse]="isAnimating()">
+      Modo: {{ gameService.currentModeName() }}
+    </h3>
+    <h4 class="card-deck__title__sub">Elige una carta 👇</h4>
+  </div>
 
   <div class="card-deck__grid">
     @for (cardValue of availableCards(); track cardValue) {

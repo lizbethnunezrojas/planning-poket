@@ -1,37 +1,81 @@
+@use 'mixins' as *;
+
 .table-m {
-  width: 603px;
-  height: 345px;
-  border: 2px #6429cd solid;
   display: flex;
   justify-content: center;
   align-items: center;
-  border-radius: 276px;
+  border: 2px #6429cd solid;
   box-shadow: 0 0 2px #bdbdff33;
   box-sizing: border-box;
+  transition: all 0.4s ease-in-out;
+
+  @include desktop {
+    width: 603px;
+    height: 345px;
+    border-radius: 276px;
+  }
+
+  @media (min-width: 601px) and (max-width: 1400px) {
+    width: 525px;
+    height: 300px;
+    border-radius: 150px;
+  }
+
+  @include mobile {
+    width: 212px;
+    height: 371px;
+    border-radius: 106px;
+  }
 
   .table-s {
-    width: 555px;
-    height: 298px;
     border: 2px #bdbdff99 solid;
     display: flex;
     justify-content: center;
     align-items: center;
-    border-radius: 276px;
     box-shadow: 0 0 3px #bdbdff99;
     background-color: transparent;
     box-sizing: border-box;
+    border-radius: inherit;
+
+    @include desktop {
+      width: 555px;
+      height: 298px;
+    }
+
+    @media (min-width: 601px) and (max-width: 1400px) {
+      width: 483px;
+      height: 260px;
+    }
+
+    @include mobile {
+      width: 184px;
+      height: 342px;
+    }
 
     .table-xs {
-      width: 521px;
-      height: 272px;
       border: 1px #6429cd solid;
       display: flex;
       justify-content: center;
       align-items: center;
-      border-radius: 276px;
-      box-shadow: 0 0 3px rgba(255, 255, 255, 0.6);
       background-color: #1f0d3f99;
+      box-shadow: 0 0 3px rgba(255, 255, 255, 0.6);
       box-sizing: border-box;
+      border-radius: inherit;
+
+      @include desktop {
+        width: 521px;
+        height: 272px;
+      }
+
+      @media (min-width: 601px) and (max-width: 1400px) {
+        width: 454px;
+        height: 238px;
+      }
+
+      @include mobile {
+        width: 168px;
+        height: 321px;
+      }
     }
   }
 }

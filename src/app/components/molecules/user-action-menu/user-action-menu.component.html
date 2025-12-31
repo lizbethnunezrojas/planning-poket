@@ -1,0 +1,7 @@
+    <div class="action-menu" (click)="$event.stopPropagation()">
+      <button (click)="action.emit('edit')">👤 Cambiar modo de vista</button>
+      <button (click)="action.emit('invite')">🔗 Invitar jugadores</button>
+      @if (isAdmin()) {
+        <button (click)="action.emit('deck')">⚙️ Cambiar mazo</button>
+      }
+    </div>
