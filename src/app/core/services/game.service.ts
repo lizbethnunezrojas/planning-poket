@@ -13,6 +13,7 @@ export interface ScoringMode {
   providedIn: 'root',
 })
 export class GameService {
+  private readonly MAX_PLAYERS = 8;
   private readonly STORAGE_KEY = 'planning_poker_game';
   private readonly USER_KEY = 'planning_poker_user';
   private readonly gameSignal = signal<Game | null>(this.loadGameFromStorage());
@@ -165,6 +166,39 @@ export class GameService {
           isMock: true,
           initialVote: '2',
         },
+        {
+          id: '3',
+          name: 'Carmen',
+          role: 'player',
+          viewMode: 'player',
+          selectedCard: '4',
+          hasSelectedCard: true,
+          gameId: savedGame.id,
+          isMock: true,
+          initialVote: '4',
+        },
+        {
+          id: '4',
+          name: 'Michel',
+          role: 'player',
+          viewMode: 'player',
+          selectedCard: '6',
+          hasSelectedCard: true,
+          gameId: savedGame.id,
+          isMock: true,
+          initialVote: '6',
+        },
+        {
+          id: '5',
+          name: 'Andres',
+          role: 'player',
+          viewMode: 'player',
+          selectedCard: '2',
+          hasSelectedCard: true,
+          gameId: savedGame.id,
+          isMock: true,
+          initialVote: '2',
+        },
       ];
       playersList = [...mocks, ...playersList];
     }
@@ -226,6 +260,11 @@ export class GameService {
 
     const storageData = localStorage.getItem('planning_poker_players');
     const existingPlayers: User[] = storageData ? JSON.parse(storageData) : [];
+
+    if (existingPlayers.length >= this.MAX_PLAYERS) {
+      alert('Lo sentimos, la partida está llena. Máximo 8 jugadores.');
+      return;
+    }
 
     const hasAdmin = existingPlayers.some((p) => p.gameId === gameId && p.role === 'admin');
     const userRole: UserRole = hasAdmin ? 'player' : 'admin';
