@@ -105,7 +105,12 @@ export class GameService {
 
   private resetVotesInternal(): void {
     this._players.update((players) => {
-      const newList = players.map((p) => ({ ...p, selectedCard: null, hasSelectedCard: false }));
+      const newList = players.map((p) => ({
+        ...p,
+        selectedCard: p.isMock ? p.initialVote ?? null : null,
+        hasSelectedCard: !!p.isMock,
+      }));
+
       localStorage.setItem('planning_poker_players', JSON.stringify(newList));
       return newList;
     });
@@ -133,13 +138,16 @@ export class GameService {
   private initializePlayers(): void {
     const savedUser = this.loadUserFromStorage();
     const savedGame = this.loadGameFromStorage();
+
     if (!savedGame) return;
 
     const storageData = localStorage.getItem('planning_poker_players');
     let playersList: User[] = storageData ? JSON.parse(storageData) : [];
 
-    if (playersList.length === 0) {
-      playersList = [
+    const hasMocks = playersList.some((p) => p.id === '2');
+
+    if (!hasMocks) {
+      const mocks: User[] = [
         {
           id: '2',
           name: 'Alonso Q',
@@ -148,6 +156,8 @@ export class GameService {
           selectedCard: '13',
           hasSelectedCard: true,
           gameId: savedGame.id,
+          isMock: true,
+          initialVote: '8',
         },
         {
           id: '3',
@@ -157,21 +167,24 @@ export class GameService {
           selectedCard: '21',
           hasSelectedCard: true,
           gameId: savedGame.id,
+          isMock: true,
+          initialVote: '2',
         },
       ];
-      localStorage.setItem('planning_poker_players', JSON.stringify(playersList));
+      playersList = [...mocks, ...playersList];
     }
 
     if (savedUser && savedUser.gameId === savedGame.id) {
       const userIndex = playersList.findIndex((p) => p.id === savedUser.id);
+
       if (userIndex === -1) {
         playersList.push(savedUser);
-        localStorage.setItem('planning_poker_players', JSON.stringify(playersList));
       } else {
         playersList[userIndex] = savedUser;
       }
     }
 
+    localStorage.setItem('planning_poker_players', JSON.stringify(playersList));
     this._players.set(playersList);
   }
 
@@ -349,7 +362,12 @@ export class GameService {
     localStorage.setItem('planning_poker_phase', 'voting');
 
     this._players.update((players) => {
-      const newList = players.map((p) => ({ ...p, selectedCard: null, hasSelectedCard: false }));
+      const newList = players.map((p) => ({
+        ...p,
+        selectedCard: p.isMock ? p.initialVote ?? null : null,
+        hasSelectedCard: !!p.isMock,
+      }));
+
       localStorage.setItem('planning_poker_players', JSON.stringify(newList));
       return newList;
     });

@@ -9,6 +9,8 @@ export interface User {
   selectedCard?: string | null; 
   hasSelectedCard: boolean;
   gameId: string;
+  isMock?: boolean;     
+  initialVote?: string;
 }
 
 export type CreateUserPayload = Omit<User, 'id'>;
