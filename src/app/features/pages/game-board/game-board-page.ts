@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { GameTableComponent } from '../../../components/organisms/game-table/game-table.component';
 import { CardDeckComponent } from '../../../components/organisms/CardDeckComponent/card-deck.component';
 import { VoteSummaryComponent } from '../../../components/molecules/vote-summary/vote-summary.component';
@@ -11,11 +11,6 @@ import { GameService } from '../../../core/services/game.service';
   templateUrl: './game-board-page.html',
   styleUrls: ['./game-board-page.scss'],
 })
-export class GameBoardPage implements OnInit {
+export class GameBoardPage {
   public readonly gameService = inject(GameService);
-
-  ngOnInit() {
-    console.log('Tablero de juego cargado exitosamente.');
-    console.log('Usuario actual:', this.gameService.currentUser()?.name);
-  }
 }

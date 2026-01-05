@@ -92,11 +92,6 @@ export class GameService {
   public changeScoringMode(modeId: string): void {
     if (!this.isAdmin()) return;
 
-    if (this.phase() !== 'voting') {
-      console.warn('Solo se puede cambiar el modo antes de revelar las cartas.');
-      return;
-    }
-
     this._currentModeId.set(modeId);
     localStorage.setItem('planning_poker_mode', modeId);
 
@@ -153,7 +148,7 @@ export class GameService {
           name: 'Alonso Q',
           role: 'player',
           viewMode: 'player',
-          selectedCard: '13',
+          selectedCard: '8',
           hasSelectedCard: true,
           gameId: savedGame.id,
           isMock: true,
@@ -164,7 +159,7 @@ export class GameService {
           name: 'Micaela R',
           role: 'player',
           viewMode: 'player',
-          selectedCard: '21',
+          selectedCard: '2',
           hasSelectedCard: true,
           gameId: savedGame.id,
           isMock: true,
@@ -206,6 +201,14 @@ export class GameService {
 
   public registerUser(userName: string, viewMode: ViewMode, inviteGameId?: string): void {
     const existingUser = this.currentUserSignal();
+    const savedGame = this.loadGameFromStorage();
+
+    const gameId = (inviteGameId || this.gameSignal()?.id)?.trim();
+
+    if (!gameId || savedGame?.id !== gameId) {
+      console.error('Acceso denegado: La partida no existe o el ID es inválido.');
+      return;
+    }
 
     if (existingUser) {
       const updatedUser: User = {
@@ -220,10 +223,6 @@ export class GameService {
       this.updatePlayerInList(updatedUser);
       return;
     }
-
-    const gameId = (inviteGameId || this.gameSignal()?.id)?.trim();
-
-    if (!gameId) return;
 
     const storageData = localStorage.getItem('planning_poker_players');
     const existingPlayers: User[] = storageData ? JSON.parse(storageData) : [];
@@ -243,19 +242,11 @@ export class GameService {
 
     this.saveUserSession(newUser);
 
-    if (!this.gameSignal() || this.gameSignal()?.id !== gameId) {
-      const gameData: Game = { id: gameId, name: 'Partida de Poker' };
-      this.gameSignal.set(gameData);
-      localStorage.setItem(this.STORAGE_KEY, JSON.stringify(gameData));
-    }
+    const isAlreadyInList = existingPlayers.some((p) => p.id === newUser.id);
+    const newList = isAlreadyInList ? existingPlayers : [...existingPlayers, newUser];
+    localStorage.setItem('planning_poker_players', JSON.stringify(newList));
 
-    this._players.update((currentSignalPlayers) => {
-      const isAlreadyInList = existingPlayers.find((p) => p.id === newUser.id);
-      const newList = isAlreadyInList ? existingPlayers : [...existingPlayers, newUser];
-
-      localStorage.setItem('planning_poker_players', JSON.stringify(newList));
-      return newList;
-    });
+    this.initializePlayers();
   }
 
   private saveUserSession(user: User): void {
@@ -315,8 +306,6 @@ export class GameService {
         if (myNewData && myNewData.role !== this.currentUserSignal()?.role) {
           this.currentUserSignal.set(myNewData);
           sessionStorage.setItem(this.USER_KEY, JSON.stringify(myNewData));
-
-          console.log(`Sistema: Tu rol ha cambiado a ${myNewData.role}`);
         }
       }
 
@@ -333,8 +322,6 @@ export class GameService {
           sessionStorage.setItem(this.USER_KEY, JSON.stringify(updated));
           return updated;
         });
-
-        console.log('Sistema: Modo de juego cambiado. Votos reseteados.');
       }
     });
   }

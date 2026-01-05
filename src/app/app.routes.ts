@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 import { authGuard } from './core/guards/auth-guard';
+import { gameExistsGuard } from './core/guards/game-exists';
 
 export const routes: Routes = [
   {
@@ -16,6 +17,7 @@ export const routes: Routes = [
 
   {
     path: 'join/:id',
+    canActivate: [gameExistsGuard],
     loadComponent: () =>
       import('./features/pages/join-game/join-game-page').then((m) => m.JoinGamePage),
   },

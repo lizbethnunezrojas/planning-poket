@@ -1,6 +1,6 @@
-$mobile-max: 600px;    // iPhone (390px)
-$tablet-max: 1200px;   // iPad (1133px)
-$laptop-max: 1400px;   // Laptop (1280px)
+$mobile-max: 600px;   
+$tablet-max: 1200px; 
+$laptop-max: 1400px;  
 
 @mixin mobile {
   @media (max-width: #{$mobile-max}) { @content; }
@@ -9,10 +9,6 @@ $laptop-max: 1400px;   // Laptop (1280px)
 @mixin tablet {
   @media (min-width: #{$mobile-max + 1}) and (max-width: #{$laptop-max}) { @content; }
 }
-
-/* @mixin laptop {
-  @media (min-width: #{$tablet-max + 1}) and (max-width: #{$laptop-max}) { @content; }
-} */
 
 @mixin desktop {
   @media (min-width: #{$laptop-max + 1}) { @content; }
