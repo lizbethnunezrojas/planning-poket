@@ -292,36 +292,43 @@ export class GameService {
 
   private listenToStorageChanges(): void {
     globalThis.addEventListener('storage', (event) => {
-      if (event.key === 'planning_poker_phase' && event.newValue) {
-        this._phase.set(event.newValue as GamePhase);
-      }
+      const { key, newValue } = event;
 
-      if (event.key === 'planning_poker_players' && event.newValue) {
-        const updatedPlayers: User[] = JSON.parse(event.newValue);
-        this._players.set(updatedPlayers);
+      if (!newValue) return;
 
-        const myCurrentId = this.currentUserSignal()?.id;
-        const myNewData = updatedPlayers.find((p) => p.id === myCurrentId);
+      switch (key) {
+        case 'planning_poker_phase':
+          this._phase.set(newValue as GamePhase);
+          break;
 
-        if (myNewData && myNewData.role !== this.currentUserSignal()?.role) {
-          this.currentUserSignal.set(myNewData);
-          sessionStorage.setItem(this.USER_KEY, JSON.stringify(myNewData));
+        case 'planning_poker_players': {
+          const updatedPlayers: User[] = JSON.parse(newValue);
+          this._players.set(updatedPlayers);
+
+          const myCurrentId = this.currentUserSignal()?.id;
+          const myNewData = updatedPlayers.find((p) => p.id === myCurrentId);
+
+          if (myNewData) {
+            if (myNewData.role !== this.currentUserSignal()?.role) {
+              console.log(`Sistema: Tu rol ha cambiado a ${myNewData.role}`);
+            }
+
+            this.currentUserSignal.set(myNewData);
+            sessionStorage.setItem(this.USER_KEY, JSON.stringify(myNewData));
+          }
+          break;
         }
-      }
 
-      if (event.key === 'planning_poker_mode' && event.newValue) {
-        this._currentModeId.set(event.newValue);
-      }
+        case 'planning_poker_mode':
+          this._currentModeId.set(newValue);
 
-      if (event.key === 'planning_poker_mode' && event.newValue) {
-        this._currentModeId.set(event.newValue);
-
-        this.currentUserSignal.update((user) => {
-          if (!user) return null;
-          const updated = { ...user, selectedCard: null, hasSelectedCard: false };
-          sessionStorage.setItem(this.USER_KEY, JSON.stringify(updated));
-          return updated;
-        });
+          this.currentUserSignal.update((user) => {
+            if (!user) return null;
+            const updated = { ...user, selectedCard: null, hasSelectedCard: false };
+            sessionStorage.setItem(this.USER_KEY, JSON.stringify(updated));
+            return updated;
+          });
+          break;
       }
     });
   }
