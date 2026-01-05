@@ -8,7 +8,7 @@
   box-sizing: border-box;
   margin: 0 auto;
 
-  @media (min-width: 601px) {
+  @include tablet {
     max-width: 62px;
     max-height: 84px;
     gap: 2px;
@@ -27,7 +27,7 @@
     width: 35px;
     border-radius: 7px;
 
-    @media (min-width: 601px) {
+    @include tablet{
       min-height: 60px;
     }
 
@@ -92,7 +92,7 @@
     overflow: hidden;
     text-overflow: ellipsis;
 
-    @media (min-width: 601px) {
+    @include tablet {
       font-size: 14px;
       max-width: 62px;
     }

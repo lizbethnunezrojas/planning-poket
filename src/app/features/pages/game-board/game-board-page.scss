@@ -19,7 +19,7 @@
 
 .deck-container {
   overflow-x: auto;
-  padding-bottom: clamp(2rem, 8rem, 12rem);
+  padding-bottom: clamp(2rem, 3rem, 4rem);
   &::-webkit-scrollbar {
     height: 4px;
   }

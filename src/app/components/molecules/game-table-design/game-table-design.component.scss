@@ -15,15 +15,15 @@
     border-radius: 276px;
   }
 
-  @media (min-width: 601px) and (max-width: 1400px) {
-    width: 525px;
-    height: 300px;
+  @include tablet {
+    width: clamp(420px, 45vw, 525px);
+    height: clamp(240px, 20vh, 300px);
     border-radius: 150px;
   }
 
   @include mobile {
-    width: 212px;
-    height: 371px;
+    width: clamp(172px, 30vw, 212px);
+    height: clamp(296px, 45vh, 371px);
     border-radius: 106px;
   }
 
@@ -42,14 +42,15 @@
       height: 298px;
     }
 
-    @media (min-width: 601px) and (max-width: 1400px) {
-      width: 483px;
-      height: 260px;
+    @include tablet {
+      width: clamp(386px, 42vw, 483px);
+      height: clamp(208px, 18vh, 260px);
+
     }
 
     @include mobile {
-      width: 184px;
-      height: 342px;
+      width: clamp(152px, 27vw, 184px);
+      height: clamp(273px, 42vh, 342px);
     }
 
     .table-xs {
@@ -67,14 +68,14 @@
         height: 272px;
       }
 
-      @media (min-width: 601px) and (max-width: 1400px) {
-        width: 454px;
-        height: 238px;
+      @include tablet {
+        width: clamp(363px, 40vw, 454px);
+        height: clamp(190px, 16.5vh, 238px);
       }
 
       @include mobile {
-        width: 168px;
-        height: 321px;
+        width: clamp(136px, 25vw, 168px);
+        height: clamp(256px, 40vh, 321px);
       }
     }
   }
