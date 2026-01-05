@@ -121,6 +121,16 @@ export class GameService {
 
   public revealCards(): void {
     if (this.currentUser()?.role === 'player') return;
+    const players = this._players();
+    const voters = players.filter((p) => p.viewMode === 'player');
+    const allHaveVoted = voters.every((p) => p.hasSelectedCard);
+
+    if (!allHaveVoted) {
+      alert(
+        'No se pueden revelar los votos hasta que todos los jugadores hayan seleccionado una carta.'
+      );
+      return;
+    }
 
     this._phase.set('loading');
     localStorage.setItem('planning_poker_phase', 'loading');
