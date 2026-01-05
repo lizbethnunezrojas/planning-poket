@@ -50,15 +50,16 @@ describe('GameService - Pruebas Integradas (HU4 a HU13)', () => {
 
   // ESTADO INICIAL Y REGISTRO
   describe('Estado Inicial y Registro', () => {
-    it('debería cargar exactamente los 2 jugadores mockeados al inicio (AC4)', () => {
+    it('debería cargar exactamente los 5 jugadores mockeados al inicio (AC4)', () => {
       const players = service.players();
-      expect(players).toHaveLength(2); // Alonso y Micaela
+      expect(players).toHaveLength(5); 
       expect(players.map((p) => p.name)).toContain('Alonso Q');
+      expect(players.map((p) => p.name)).toContain('Andres');
     });
 
-    it('debería añadir un nuevo usuario a la lista (Total: 3 jugadores)', () => {
+    it('debería añadir un nuevo usuario a la lista (Total: 6 jugadores)', () => {
       service.registerUser('Luis', 'player');
-      expect(service.players()).toHaveLength(3);
+      expect(service.players()).toHaveLength(6);
     });
 
     it('debería mantener el ID al cambiar de modo (HU12)', () => {
@@ -105,9 +106,14 @@ describe('GameService - Pruebas Integradas (HU4 a HU13)', () => {
       expect(service.averageScore()).toBe('9.0');
     });
 
-    it('debe transicionar a fase revealed tras 2 segundos', async () => {
+    it('debe transicionar a fase revealed tras 2 segundos si todos votaron', async () => {
       vi.useFakeTimers();
+      
+      const admin: User = { id: '1', role: 'admin', viewMode: 'player', hasSelectedCard: true } as any;
+      (service as any).currentUserSignal.set(admin);
+      
       service.revealCards();
+      
       expect(service.phase()).toBe('loading');
       await vi.advanceTimersByTimeAsync(2000);
       expect(service.phase()).toBe('revealed');
@@ -150,7 +156,6 @@ describe('GameService - HU14: Cambio de Modo de Puntaje', () => {
   let service: GameService;
 
   beforeEach(() => {
-    // Setup con hidratación previa para tener un juego activo
     const localStore: Record<string, string> = {
       'planning_poker_game': JSON.stringify({ id: 'G1', name: 'Test' })
     };
@@ -179,14 +184,15 @@ describe('GameService - HU14: Cambio de Modo de Puntaje', () => {
   });
 
   it('solo debe permitir el cambio si la fase es "voting" (AC 3)', () => {
-    const admin: User = { id: '1', role: 'admin' } as any;
-    (service as any).currentUserSignal.set(admin);
-    (service as any)._phase.set('revealed'); 
+      const admin: User = { id: '1', role: 'admin' } as any;
+      (service as any).currentUserSignal.set(admin);
+      
+      (service as any)._phase.set('revealed'); 
 
-    service.changeScoringMode('tshirt');
+      service.changeScoringMode('powers');
 
-    expect(service.currentModeId()).toBe('fibonacci');
-  });
+      expect(service.currentModeId()).toBe('fibonacci');
+    });
 
 it('debe cambiar las cartas disponibles al elegir un nuevo modo (AC 2, AC 6)', () => {
   const admin: User = { id: '1', role: 'admin' } as any;

@@ -589,7 +589,7 @@ export class GameService {
   }
 
   public changeScoringMode(modeId: string): void {
-    if (!this.isAdmin()) return;
+    if (!this.isAdmin() || this.phase() !== 'voting') return;
     this._currentModeId.set(modeId);
     localStorage.setItem(this.KEYS.MODE, modeId);
     this.resetAllVotes();
